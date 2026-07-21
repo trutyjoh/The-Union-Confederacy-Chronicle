@@ -1,0 +1,75 @@
+{
+  "settings": {
+    "volume": "Vol. I · No. 1",
+    "priceLine": "Price: One Campaign Point",
+    "issueDate": "Tuesday, July 21, 2026",
+    "kicker": "A Campaign Journal of GMT Games' The U.S. Civil War",
+    "mastheadPrefix": "The",
+    "mastheadMain": "Union & Confederacy",
+    "mastheadSuffix": "Chronicle",
+    "motto": "All the News the Telegraph Can Carry",
+    "telegrams": [
+      { "location": "Washington.", "text": "New levies ordered to the western forts." },
+      { "location": "Richmond.", "text": "Cabinet reports confidence in Virginia." },
+      { "location": "Cairo.", "text": "Gunboats expected before the next action round." },
+      { "location": "St. Louis.", "text": "Missouri remains the object of both armies." }
+    ],
+    "editorPurpose": "This journal records decisions, reverses, rules questions, and the small stories that emerge during a complete campaign.",
+    "leadLabel": "Extra! · First Campaign Report",
+    "leadTitle": "War Erupts Across the Republic",
+    "leadSubhead": "Lincoln Calls for Volunteers; Richmond Marshals Its Forces—A Long Contest Is Feared",
+    "leadByline": "By the Editor, Special Correspondent at the Gaming Table",
+    "leadBody": [
+      "Hostilities have commenced. From the white hexes of the loyal states to the green country of the seceded South, counters are assembling and rail lines hum with movement. The first Strategy Cards have been dealt; every hand contains a promise and a trap.",
+      "For this campaign I command both governments in turn, preserving each side's intentions in a sealed notebook. The Union must use its greater strength without squandering its Strategic Will. The Confederacy must make space and time do the work that industry cannot.",
+      "The map, reproduced from the digital play module, immediately tells the central story: rivers enter the Confederacy like roads; the Appalachian wall divides theaters; Washington and Richmond sit dangerously near one another. Every march is therefore political as well as military."
+    ],
+    "unionStrategicWill": "93",
+    "confederateStrategicWill": "97",
+    "ledger": [
+      { "label": "Turn", "value": "Summer 1861" },
+      { "label": "Action Cycle", "value": "4 of 5" },
+      { "label": "Union SW", "value": "93 (-7)" },
+      { "label": "Confederate SW", "value": "97 (-3)" },
+      { "label": "Blockade", "value": "Level 0" },
+      { "label": "Emancipation", "value": "Not yet possible" }
+    ],
+    "mapReferenceUrl": "https://raw.githubusercontent.com/trutyjoh/The-Union-Confederacy-Chronicle/main/public/us-civil-war-map.jpg",
+    "mapAlt": "Map board for GMT Games' The U.S. Civil War, showing the Eastern and Western theaters",
+    "mapCaption": "The national theater of operations. Map artwork from the locally available U.S. Civil War digital game material; used here as a campaign reference.",
+    "archive": [
+      { "number": "No. 1", "title": "Summer 1861: The Guns Speak", "anchor": "latest", "status": "published" },
+      { "number": "No. 2", "title": "Summer 1861: Rivers & Rails", "status": "planned" },
+      { "number": "No. 3", "title": "Fall 1861: Forthcoming", "status": "forthcoming" }
+    ],
+    "footerLine": "Printed for the private campaign record · One game, two governments, innumerable decisions"
+  },
+  "dispatches": [
+    {
+      "slug": "western",
+      "eyebrow": "Western Theater",
+      "campaignDate": "Summer, 1861 · Turn One",
+      "title": "The Rivers Will Decide It",
+      "dek": "Washington places its first great wager upon the Cumberland and Tennessee, while Richmond trusts distance, weather, and the loyalty of Kentucky.",
+      "body": [
+        "The opening hands made the temper of both governments plain. The Union gathered strength at Cairo and Cincinnati, intending to turn the great waterways into blue highways. Confederate councils answered by reinforcing Nashville and the Mississippi line rather than seeking an early, theatrical battle.",
+        "Political control proved the day's true currency. Missouri wavered, Kentucky watched, and every rail junction suddenly seemed worth a brigade. No capital has fallen, yet the geography of the war has already begun to narrow the choices of both presidents."
+      ],
+      "note": "Player's note: I resisted a premature drive on Richmond. The western river net looks slower on the first turn—and much more dangerous by the third.",
+      "sortOrder": 10
+    },
+    {
+      "slug": "manassas",
+      "eyebrow": "Dispatch From Virginia",
+      "campaignDate": "Summer, 1861 · Action Round Four",
+      "title": "Smoke Above Manassas",
+      "dek": "A sharp engagement checks Federal enthusiasm outside Washington; neither army possesses the strength for a decision.",
+      "body": [
+        "The Army of Northeastern Virginia crossed with confidence and retired in disorder. Johnston's gray columns arrived at the needed hour, but attrition and the threatened Federal reinforcement at Washington kept the victors from pursuit.",
+        "The result is less a triumph than a warning. The Confederacy holds the field; the Union still holds the men, rails, and time. Richmond's correspondents celebrate. This editor merely records that both armies now know the cost of a bad die differential."
+      ],
+      "note": "Rules desk: Battle resolved on the CRT after interception and leader modifiers. The result shifted Strategic Will, but did not break the Union position.",
+      "sortOrder": 20
+    }
+  ]
+}

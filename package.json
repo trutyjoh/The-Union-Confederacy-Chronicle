@@ -2,6 +2,7 @@
   "name": "union-confederacy-chronicle",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@11.9.0",
   "engines": {
     "node": ">=22.13.0"
   },
@@ -12,15 +13,23 @@
     "sites:dev": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext dev",
     "sites:build": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext build",
     "sites:start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
-    "test": "npm run build && node --test tests/rendered-html.test.mjs",
+    "sanity:seed": "node scripts/seed-sanity.mjs",
+    "sanity:dev": "sanity dev",
+    "test": "pnpm build && node --test tests/rendered-html.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate"
   },
   "dependencies": {
+    "@portabletext/react": "^6.2.0",
+    "@sanity/client": "^7.24.0",
+    "@sanity/image-url": "^2.1.1",
+    "@sanity/vision": "^6.5.0",
     "drizzle-orm": "0.45.2",
     "next": "16.2.6",
+    "next-sanity": "^13.1.4",
     "react": "19.2.6",
-    "react-dom": "19.2.6"
+    "react-dom": "19.2.6",
+    "sanity": "^6.5.0"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.37.1",
