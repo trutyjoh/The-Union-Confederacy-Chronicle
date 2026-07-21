@@ -72,3 +72,20 @@ test("offers curated period typography menus", async () => {
   assert.match(page, /type-masthead-/);
   assert.match(layout, /Libre_Caslon_Text/);
 });
+
+test("supports featured and inline dispatch images", async () => {
+  const [dispatchSchema, imageSchema, schemaIndex, page] = await Promise.all([
+    readFile(new URL("../schemas/campaignDispatch.ts", import.meta.url), "utf8"),
+    readFile(new URL("../schemas/dispatchImage.ts", import.meta.url), "utf8"),
+    readFile(new URL("../schemas/index.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(dispatchSchema, /featuredImage/);
+  assert.match(dispatchSchema, /defineArrayMember\(\{ type: "dispatchImage" \}\)/);
+  assert.match(imageSchema, /hotspot: true/);
+  assert.match(imageSchema, /Accessibility description/);
+  assert.match(schemaIndex, /dispatchImage/);
+  assert.match(page, /portableTextComponents/);
+  assert.match(page, /createImageUrlBuilder/);
+});

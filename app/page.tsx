@@ -1,7 +1,55 @@
-import { PortableText } from "@portabletext/react";
+import { PortableText, type PortableTextComponents } from "@portabletext/react";
 import { stegaClean } from "@sanity/client/stega";
+import { createImageUrlBuilder } from "@sanity/image-url";
+import Image from "next/image";
 import type { PortableTextBlock } from "sanity";
-import { getChronicleContent, type RichBody } from "@/lib/chronicle";
+import {
+  getChronicleContent,
+  type DispatchImage as DispatchImageValue,
+  type RichBody,
+} from "@/lib/chronicle";
+import { dataset, projectId } from "@/lib/sanity";
+
+const imageBuilder = createImageUrlBuilder({ projectId, dataset });
+
+function DispatchImage({
+  value,
+  featured = false,
+}: {
+  value?: DispatchImageValue;
+  featured?: boolean;
+}) {
+  if (!value?.asset) return null;
+
+  const placement = featured ? "featured" : stegaClean(value.placement || "wide");
+  const treatment = stegaClean(value.treatment || "newspaper");
+  const sourceWidth = value.asset.metadata?.dimensions?.width || 1200;
+  const sourceHeight = value.asset.metadata?.dimensions?.height || 800;
+  const requestedWidth = featured || placement === "wide" ? 1200 : 720;
+  const requestedHeight = Math.round(requestedWidth * (sourceHeight / sourceWidth));
+  const src = imageBuilder.image(value).width(requestedWidth).fit("max").auto("format").url();
+
+  return (
+    <figure className={`dispatch-image dispatch-image--${placement} dispatch-image--${treatment}`}>
+      <Image
+        src={src}
+        alt={value.alt || ""}
+        width={requestedWidth}
+        height={requestedHeight}
+        sizes={featured || placement === "wide" ? "(max-width: 900px) 100vw, 560px" : "(max-width: 640px) 100vw, 280px"}
+        placeholder={value.asset.metadata?.lqip ? "blur" : "empty"}
+        blurDataURL={value.asset.metadata?.lqip}
+      />
+      {value.caption ? <figcaption>{value.caption}</figcaption> : null}
+    </figure>
+  );
+}
+
+const portableTextComponents: PortableTextComponents = {
+  types: {
+    dispatchImage: ({ value }) => <DispatchImage value={value as DispatchImageValue} />,
+  },
+};
 
 function StoryBody({ body, className }: { body: RichBody; className: string }) {
   const isPlainText = body.every((block) => typeof block === "string");
@@ -11,7 +59,7 @@ function StoryBody({ body, className }: { body: RichBody; className: string }) {
       {isPlainText ? (
         (body as string[]).map((paragraph) => <p key={stegaClean(paragraph)}>{paragraph}</p>)
       ) : (
-        <PortableText value={body as PortableTextBlock[]} />
+        <PortableText value={body as PortableTextBlock[]} components={portableTextComponents} />
       )}
     </div>
   );
@@ -124,6 +172,7 @@ export default async function Home() {
                 <h2>{post.title}</h2>
                 <p className="post-date">{post.campaignDate}</p>
                 <p className="subhead">{post.dek}</p>
+                <DispatchImage value={post.featuredImage} featured />
                 <StoryBody body={post.body} className="body-copy" />
                 {post.note ? <blockquote>{post.note}</blockquote> : null}
               </article>

@@ -1,4 +1,4 @@
-import { defineField, defineType } from "sanity";
+import { defineArrayMember, defineField, defineType } from "sanity";
 
 export const campaignDispatch = defineType({
   name: "campaignDispatch",
@@ -39,10 +39,19 @@ export const campaignDispatch = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: "featuredImage",
+      title: "Featured image",
+      type: "dispatchImage",
+      description: "Optional image displayed beneath the subheadline.",
+    }),
+    defineField({
       name: "body",
       title: "Dispatch text",
       type: "array",
-      of: [{ type: "block" }],
+      of: [
+        defineArrayMember({ type: "block" }),
+        defineArrayMember({ type: "dispatchImage" }),
+      ],
       validation: (rule) => rule.required(),
     }),
     defineField({

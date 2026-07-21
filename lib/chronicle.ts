@@ -3,6 +3,26 @@ import { sanityFetch } from "@/lib/sanity";
 
 export type RichBody = string[] | Array<Record<string, unknown>>;
 
+export type DispatchImage = {
+  _key?: string;
+  _type?: "dispatchImage";
+  asset?: {
+    _id?: string;
+    _ref?: string;
+    url?: string;
+    metadata?: {
+      lqip?: string;
+      dimensions?: { width?: number; height?: number };
+    };
+  };
+  alt?: string;
+  caption?: string;
+  placement?: "wide" | "column" | "left" | "right";
+  treatment?: "newspaper" | "sepia" | "original";
+  crop?: Record<string, number>;
+  hotspot?: Record<string, number>;
+};
+
 export type Telegram = { _key?: string; location: string; text: string };
 export type LedgerEntry = { _key?: string; label: string; value: string };
 export type ArchiveEntry = {
@@ -49,6 +69,7 @@ export type CampaignDispatch = {
   campaignDate: string;
   title: string;
   dek: string;
+  featuredImage?: DispatchImage;
   body: RichBody;
   note: string;
   sortOrder: number;
@@ -96,7 +117,17 @@ const chronicleQuery = `{
     campaignDate,
     title,
     dek,
-    body,
+    featuredImage{
+      ...,
+      asset->{_id, url, metadata{lqip, dimensions{width, height}}}
+    },
+    body[]{
+      ...,
+      _type == "dispatchImage" => {
+        ...,
+        asset->{_id, url, metadata{lqip, dimensions{width, height}}}
+      }
+    },
     note,
     sortOrder
   }
