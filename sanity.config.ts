@@ -9,6 +9,7 @@ const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || "production";
 export default defineConfig({
   name: "default",
   title: "Union & Confederacy Chronicle",
+  basePath: "/studio",
   projectId,
   dataset,
   plugins: [structureTool(), visionTool()],
