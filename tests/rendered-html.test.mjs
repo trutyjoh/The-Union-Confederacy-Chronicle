@@ -89,3 +89,22 @@ test("supports featured and inline dispatch images", async () => {
   assert.match(page, /portableTextComponents/);
   assert.match(page, /createImageUrlBuilder/);
 });
+
+test("supports a private dispatch archive workflow", async () => {
+  const [dispatchSchema, client, config, structure] = await Promise.all([
+    readFile(new URL("../schemas/campaignDispatch.ts", import.meta.url), "utf8"),
+    readFile(new URL("../lib/chronicle.ts", import.meta.url), "utf8"),
+    readFile(new URL("../sanity.config.ts", import.meta.url), "utf8"),
+    readFile(new URL("../sanity/structure.ts", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(dispatchSchema, /Dispatch status/);
+  assert.match(dispatchSchema, /value: "current"/);
+  assert.match(dispatchSchema, /value: "working"/);
+  assert.match(dispatchSchema, /value: "archived"/);
+  assert.match(client, /coalesce\(status, "current"\) == "current"/);
+  assert.match(config, /structureTool\(\{ structure \}\)/);
+  assert.match(structure, /Current Dispatches/);
+  assert.match(structure, /Working Drafts/);
+  assert.match(structure, /Dispatch Archive/);
+});

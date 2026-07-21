@@ -3,6 +3,7 @@ import { defineConfig } from "sanity";
 import { presentationTool } from "sanity/presentation";
 import { structureTool } from "sanity/structure";
 import { presentationResolve } from "./sanity/presentation/resolve";
+import { structure } from "./sanity/structure";
 import { schemaTypes } from "./schemas";
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "uo48c7q4";
@@ -18,7 +19,7 @@ export default defineConfig({
   projectId,
   dataset,
   plugins: [
-    structureTool(),
+    structureTool({ structure }),
     presentationTool({
       resolve: presentationResolve,
       previewUrl: {

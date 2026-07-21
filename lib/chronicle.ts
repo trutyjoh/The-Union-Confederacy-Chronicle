@@ -64,6 +64,7 @@ export type ChronicleSettings = {
 
 export type CampaignDispatch = {
   _id?: string;
+  status: "current" | "working" | "archived";
   slug: string;
   eyebrow: string;
   campaignDate: string;
@@ -110,8 +111,9 @@ const chronicleQuery = `{
     archive[]{_key, number, title, anchor, status},
     footerLine
   },
-  "dispatches": *[_type == "campaignDispatch"] | order(sortOrder asc, campaignDate asc){
+  "dispatches": *[_type == "campaignDispatch" && coalesce(status, "current") == "current"] | order(sortOrder asc, campaignDate asc){
     _id,
+    "status": coalesce(status, "current"),
     "slug": slug.current,
     eyebrow,
     campaignDate,
@@ -139,7 +141,7 @@ export async function getChronicleContent(): Promise<ChronicleContent> {
     const { data: content } = await sanityFetch({ query: chronicleQuery });
 
     const typedContent = content as ChronicleContent;
-    if (!typedContent?.settings || !typedContent.dispatches?.length) return fallback;
+    if (!typedContent?.settings || !typedContent.dispatches) return fallback;
     return typedContent;
   } catch {
     return fallback;

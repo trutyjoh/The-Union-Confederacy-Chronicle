@@ -49,6 +49,7 @@
   },
   "dispatches": [
     {
+      "status": "current",
       "slug": "western",
       "eyebrow": "Western Theater",
       "campaignDate": "Summer, 1861 · Turn One",
@@ -62,6 +63,7 @@
       "sortOrder": 10
     },
     {
+      "status": "current",
       "slug": "manassas",
       "eyebrow": "Dispatch From Virginia",
       "campaignDate": "Summer, 1861 · Action Round Four",
