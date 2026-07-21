@@ -40,3 +40,19 @@ test("keeps Sanity content and schema in editable source files", async () => {
   assert.match(config, /schemaTypes/);
   assert.match(content, /Smoke Above Manassas/);
 });
+
+test("configures Sanity Presentation and secure Draft Mode", async () => {
+  const [config, layout, enableRoute, locations] = await Promise.all([
+    readFile(new URL("../sanity.config.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/draft-mode/enable/route.ts", import.meta.url), "utf8"),
+    readFile(new URL("../sanity/presentation/resolve.ts", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(config, /presentationTool/);
+  assert.match(config, /previewMode/);
+  assert.match(layout, /VisualEditing/);
+  assert.match(layout, /SanityLive/);
+  assert.match(enableRoute, /defineEnableDraftMode/);
+  assert.match(locations, /campaignDispatch/);
+});

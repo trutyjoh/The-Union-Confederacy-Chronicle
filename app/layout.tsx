@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import { draftMode } from "next/headers";
+import { VisualEditing } from "next-sanity/visual-editing";
+import { SanityLive } from "@/lib/sanity";
 import "./globals.css";
 
 const socialImage = "https://raw.githubusercontent.com/trutyjoh/The-Union-Confederacy-Chronicle/main/public/og.png";
@@ -21,6 +24,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body>{children}</body></html>;
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const { isEnabled } = await draftMode();
+
+  return (
+    <html lang="en">
+      <body>
+        {children}
+        <SanityLive />
+        {isEnabled ? <VisualEditing /> : null}
+      </body>
+    </html>
+  );
 }

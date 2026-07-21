@@ -1,11 +1,12 @@
-import { createClient } from "next-sanity";
 import fallbackContent from "@/content/chronicle.json";
+import { sanityFetch } from "@/lib/sanity";
 
 export type RichBody = string[] | Array<Record<string, unknown>>;
 
-export type Telegram = { location: string; text: string };
-export type LedgerEntry = { label: string; value: string };
+export type Telegram = { _key?: string; location: string; text: string };
+export type LedgerEntry = { _key?: string; label: string; value: string };
 export type ArchiveEntry = {
+  _key?: string;
   number: string;
   title: string;
   anchor?: string;
@@ -39,6 +40,7 @@ export type ChronicleSettings = {
 };
 
 export type CampaignDispatch = {
+  _id?: string;
   slug: string;
   eyebrow: string;
   campaignDate: string;
@@ -54,18 +56,9 @@ export type ChronicleContent = {
   dispatches: CampaignDispatch[];
 };
 
-const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "uo48c7q4";
-const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || "production";
-
-const client = createClient({
-  projectId,
-  dataset,
-  apiVersion: "2026-07-21",
-  useCdn: true,
-});
-
 const chronicleQuery = `{
   "settings": *[_type == "siteSettings"][0]{
+    _id,
     volume,
     priceLine,
     issueDate,
@@ -74,7 +67,7 @@ const chronicleQuery = `{
     mastheadMain,
     mastheadSuffix,
     motto,
-    telegrams[]{location, text},
+    telegrams[]{_key, location, text},
     editorPurpose,
     leadLabel,
     leadTitle,
@@ -83,14 +76,15 @@ const chronicleQuery = `{
     leadBody,
     unionStrategicWill,
     confederateStrategicWill,
-    ledger[]{label, value},
+    ledger[]{_key, label, value},
     "mapReferenceUrl": coalesce(mapImage.asset->url, mapReferenceUrl),
     mapAlt,
     mapCaption,
-    archive[]{number, title, anchor, status},
+    archive[]{_key, number, title, anchor, status},
     footerLine
   },
   "dispatches": *[_type == "campaignDispatch"] | order(sortOrder asc, campaignDate asc){
+    _id,
     "slug": slug.current,
     eyebrow,
     campaignDate,
@@ -105,14 +99,11 @@ const chronicleQuery = `{
 export async function getChronicleContent(): Promise<ChronicleContent> {
   const fallback = fallbackContent as ChronicleContent;
   try {
-    const content = await client.fetch<ChronicleContent>(
-      chronicleQuery,
-      {},
-      { next: { revalidate: 60 } },
-    );
+    const { data: content } = await sanityFetch({ query: chronicleQuery });
 
-    if (!content?.settings || !content.dispatches?.length) return fallback;
-    return content;
+    const typedContent = content as ChronicleContent;
+    if (!typedContent?.settings || !typedContent.dispatches?.length) return fallback;
+    return typedContent;
   } catch {
     return fallback;
   }

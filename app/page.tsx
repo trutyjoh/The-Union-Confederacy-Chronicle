@@ -1,4 +1,5 @@
 import { PortableText } from "@portabletext/react";
+import { stegaClean } from "@sanity/client/stega";
 import type { PortableTextBlock } from "sanity";
 import { getChronicleContent, type RichBody } from "@/lib/chronicle";
 
@@ -8,7 +9,7 @@ function StoryBody({ body, className }: { body: RichBody; className: string }) {
   return (
     <div className={className}>
       {isPlainText ? (
-        (body as string[]).map((paragraph) => <p key={paragraph}>{paragraph}</p>)
+        (body as string[]).map((paragraph) => <p key={stegaClean(paragraph)}>{paragraph}</p>)
       ) : (
         <PortableText value={body as PortableTextBlock[]} />
       )}
@@ -50,7 +51,7 @@ export default async function Home() {
             <h2>Telegraphic Summary</h2>
             <ul className="telegrams">
               {settings.telegrams.map((item) => (
-                <li key={`${item.location}-${item.text}`}>
+                <li key={item._key || `${stegaClean(item.location)}-${stegaClean(item.text)}`}>
                   <b>{item.location}</b> {item.text}
                 </li>
               ))}
@@ -84,7 +85,7 @@ export default async function Home() {
             <table>
               <tbody>
                 {settings.ledger.map(({ label, value }) => (
-                  <tr key={label}>
+                  <tr key={stegaClean(label)}>
                     <th>{label}</th>
                     <td>{value}</td>
                   </tr>
@@ -102,7 +103,7 @@ export default async function Home() {
             <span>The Map Room</span>
           </div>
           <div className="map-frame">
-            <img src={settings.mapReferenceUrl} alt={settings.mapAlt} />
+            <img src={stegaClean(settings.mapReferenceUrl)} alt={settings.mapAlt} />
           </div>
           <p className="caption">{settings.mapCaption}</p>
         </section>
@@ -113,7 +114,7 @@ export default async function Home() {
           </div>
           <div className="dispatch-grid">
             {dispatches.map((post) => (
-              <article className="dispatch" id={post.slug} key={post.slug}>
+              <article className="dispatch" id={stegaClean(post.slug)} key={post._id || stegaClean(post.slug)}>
                 <p className="section-label">{post.eyebrow}</p>
                 <h2>{post.title}</h2>
                 <p className="post-date">{post.campaignDate}</p>
@@ -132,9 +133,9 @@ export default async function Home() {
           </div>
           <ol>
             {settings.archive.map((entry) => (
-              <li key={`${entry.number}-${entry.title}`}>
+              <li key={entry._key || `${stegaClean(entry.number)}-${stegaClean(entry.title)}`}>
                 {entry.anchor ? (
-                  <a href={`#${entry.anchor}`}>
+                  <a href={`#${stegaClean(entry.anchor)}`}>
                     <span>{entry.number}</span> {entry.title}
                   </a>
                 ) : (
