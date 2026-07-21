@@ -63,6 +63,20 @@ blockquote { margin:15px 0 0; padding:12px 15px; border:1px solid #715a42; font-
 footer { display:flex; justify-content:space-between; gap:20px; padding-top:18px; text-transform:uppercase; font:700 9px Arial,sans-serif; letter-spacing:.12em; }
 .footer-links { display:flex; gap:18px; }
 
+/* Curated period typefaces selected from Sanity's Newspaper Settings. */
+.type-masthead-fell .masthead h1 { font-family:var(--font-im-fell),Georgia,serif; font-weight:400; letter-spacing:.005em; text-transform:none; }
+.type-masthead-blackletter .masthead h1 { font-family:var(--font-blackletter),Georgia,serif; font-weight:700; letter-spacing:0; text-transform:none; }
+.type-masthead-caslon .masthead h1 { font-family:var(--font-caslon),Georgia,serif; font-weight:700; letter-spacing:-.025em; }
+.type-headline-old-standard :is(.lead-story h2,.dispatch h2,.side-column h2,.side-column h3,.ledger h2,.section-rule,.archive h2) { font-family:var(--font-old-standard),Georgia,serif; font-weight:700; }
+.type-headline-clarendon :is(.lead-story h2,.dispatch h2,.side-column h2,.side-column h3,.ledger h2,.section-rule,.archive h2) { font-family:var(--font-clarendon),Rockwell,serif; font-weight:400; letter-spacing:-.015em; }
+.type-headline-cormorant :is(.lead-story h2,.dispatch h2,.side-column h2,.side-column h3,.ledger h2,.section-rule,.archive h2) { font-family:var(--font-cormorant),Georgia,serif; font-weight:700; letter-spacing:-.015em; }
+.type-body-caslon :is(.story-columns,.body-copy) { font-family:var(--font-caslon),Georgia,serif; }
+.type-body-baskerville :is(.story-columns,.body-copy) { font-family:var(--font-baskerville),Georgia,serif; }
+.type-body-old-standard :is(.story-columns,.body-copy) { font-family:var(--font-old-standard),Georgia,serif; }
+.type-body-caslon :is(.dropcap,.story-columns>p:first-child)::first-letter { font-family:var(--font-caslon),Georgia,serif; }
+.type-body-baskerville :is(.dropcap,.story-columns>p:first-child)::first-letter { font-family:var(--font-baskerville),Georgia,serif; }
+.type-body-old-standard :is(.dropcap,.story-columns>p:first-child)::first-letter { font-family:var(--font-old-standard),Georgia,serif; }
+
 @media (max-width:900px) { .newspaper{padding:24px}.lead-grid{grid-template-columns:1fr 2.2fr}.ledger{grid-column:1/-1}.dispatch-grid{grid-template-columns:1fr}.dispatch+.dispatch{border-left:0;border-top:1px solid #725d46;padding:28px 0 0}.archive{grid-template-columns:1fr} }
 @media (max-width:640px) { .page-shell{padding:0}.newspaper{padding:20px 16px}.utility-line span:nth-child(2){display:none}.masthead h1{font-size:41px}.motto{gap:6px}nav{flex-wrap:wrap}nav a{padding:8px 9px}.lead-grid{grid-template-columns:1fr}.lead-story{grid-row:1;border-inline:0;padding:0}.side-column{grid-row:2}.story-columns,.body-copy{columns:1}.lead-story h2{font-size:51px}.map-frame img{aspect-ratio:1.35/1}.dispatch h2{font-size:34px}.archive ol{columns:1}footer{display:block}.footer-links{margin-top:10px;justify-content:space-between}.section-rule{font-size:25px}.section-rule::before,.section-rule::after{display:none} }
 @media print { body{background:white}.page-shell{padding:0}.newspaper{box-shadow:none;width:100%;border:0}nav{display:none} }

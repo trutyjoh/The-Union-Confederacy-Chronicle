@@ -19,10 +19,15 @@ function StoryBody({ body, className }: { body: RichBody; className: string }) {
 
 export default async function Home() {
   const { settings, dispatches } = await getChronicleContent();
+  const typographyClasses = [
+    `type-masthead-${stegaClean(settings.mastheadTypeface || "fell")}`,
+    `type-headline-${stegaClean(settings.headlineTypeface || "old-standard")}`,
+    `type-body-${stegaClean(settings.bodyTypeface || "caslon")}`,
+  ].join(" ");
 
   return (
     <main className="page-shell">
-      <div className="newspaper">
+      <div className={`newspaper ${typographyClasses}`}>
         <header className="masthead" id="top">
           <div className="utility-line">
             <span>{settings.volume}</span>

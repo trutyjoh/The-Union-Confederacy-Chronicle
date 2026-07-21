@@ -56,3 +56,19 @@ test("configures Sanity Presentation and secure Draft Mode", async () => {
   assert.match(enableRoute, /defineEnableDraftMode/);
   assert.match(locations, /campaignDispatch/);
 });
+
+test("offers curated period typography menus", async () => {
+  const [schema, page, layout] = await Promise.all([
+    readFile(new URL("../schemas/siteSettings.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(schema, /mastheadTypeface/);
+  assert.match(schema, /headlineTypeface/);
+  assert.match(schema, /bodyTypeface/);
+  assert.match(schema, /Unifraktur/);
+  assert.match(schema, /Clarendon-style/);
+  assert.match(page, /type-masthead-/);
+  assert.match(layout, /Libre_Caslon_Text/);
+});

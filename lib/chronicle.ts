@@ -14,6 +14,9 @@ export type ArchiveEntry = {
 };
 
 export type ChronicleSettings = {
+  mastheadTypeface: "fell" | "blackletter" | "caslon";
+  headlineTypeface: "old-standard" | "clarendon" | "cormorant";
+  bodyTypeface: "caslon" | "baskerville" | "old-standard";
   volume: string;
   priceLine: string;
   issueDate: string;
@@ -59,6 +62,9 @@ export type ChronicleContent = {
 const chronicleQuery = `{
   "settings": *[_type == "siteSettings"][0]{
     _id,
+    "mastheadTypeface": coalesce(mastheadTypeface, "fell"),
+    "headlineTypeface": coalesce(headlineTypeface, "old-standard"),
+    "bodyTypeface": coalesce(bodyTypeface, "caslon"),
     volume,
     priceLine,
     issueDate,

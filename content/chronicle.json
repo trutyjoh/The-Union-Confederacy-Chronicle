@@ -1,5 +1,8 @@
 {
   "settings": {
+    "mastheadTypeface": "fell",
+    "headlineTypeface": "old-standard",
+    "bodyTypeface": "caslon",
     "volume": "Vol. I · No. 1",
     "priceLine": "Price: One Campaign Point",
     "issueDate": "Tuesday, July 21, 2026",

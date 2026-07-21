@@ -13,6 +13,48 @@ export const siteSettings = defineType({
   title: "Newspaper Settings",
   type: "document",
   fields: [
+    defineField({
+      name: "mastheadTypeface",
+      title: "Masthead font",
+      type: "string",
+      description: "Controls the large newspaper name at the top of the page.",
+      initialValue: "fell",
+      options: {
+        list: [
+          { title: "IM FELL English — early press", value: "fell" },
+          { title: "Unifraktur — ornamental blackletter", value: "blackletter" },
+          { title: "Libre Caslon — classical Roman", value: "caslon" },
+        ],
+      },
+    }),
+    defineField({
+      name: "headlineTypeface",
+      title: "Headline font",
+      type: "string",
+      description: "Controls lead headlines, dispatch headlines, and section titles.",
+      initialValue: "old-standard",
+      options: {
+        list: [
+          { title: "Old Standard — nineteenth-century news", value: "old-standard" },
+          { title: "Ultra — Clarendon-style wood type", value: "clarendon" },
+          { title: "Cormorant Garamond — formal dispatch", value: "cormorant" },
+        ],
+      },
+    }),
+    defineField({
+      name: "bodyTypeface",
+      title: "Article text font",
+      type: "string",
+      description: "Controls the newspaper columns and campaign dispatch text.",
+      initialValue: "caslon",
+      options: {
+        list: [
+          { title: "Libre Caslon Text — period broadsheet", value: "caslon" },
+          { title: "Libre Baskerville — crisp newspaper", value: "baskerville" },
+          { title: "Old Standard TT — archival edition", value: "old-standard" },
+        ],
+      },
+    }),
     defineField({ name: "volume", title: "Volume and issue", type: "string" }),
     defineField({ name: "priceLine", title: "Price line", type: "string" }),
     defineField({ name: "issueDate", title: "Issue date", type: "string" }),
