@@ -104,7 +104,7 @@ export default function Home() {
         <section className="map-room" id="map-room">
           <div className="section-rule"><span>The Map Room</span></div>
           <div className="map-frame">
-            <img src="/us-civil-war-map.jpg" alt="Map board for GMT Games' The U.S. Civil War, showing the Eastern and Western theaters" />
+            <img src="https://raw.githubusercontent.com/trutyjoh/The-Union-Confederacy-Chronicle/main/public/us-civil-war-map.jpg" alt="Map board for GMT Games' The U.S. Civil War, showing the Eastern and Western theaters" />
           </div>
           <p className="caption">The national theater of operations. Map artwork from the locally available U.S. Civil War digital game material; used here as a campaign reference.</p>
         </section>
