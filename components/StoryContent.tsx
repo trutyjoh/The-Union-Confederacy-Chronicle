@@ -7,7 +7,7 @@ import type {
   DispatchImage as DispatchImageValue,
   RichBody,
 } from "@/lib/chronicle";
-import { dataset, projectId } from "@/lib/sanity";
+import { dataset, projectId } from "@/lib/sanity-config";
 
 const imageBuilder = createImageUrlBuilder({ projectId, dataset });
 

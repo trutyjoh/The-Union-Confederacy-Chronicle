@@ -28,5 +28,16 @@ export const presentationResolve: PresentationPluginOptions["resolve"] = {
         ],
       }),
     }),
+    campaignMap: defineLocations({
+      select: { title: "title" },
+      resolve: (document) => ({
+        locations: [
+          {
+            title: document?.title || "Campaign map",
+            href: "/#map-room",
+          },
+        ],
+      }),
+    }),
   },
 };

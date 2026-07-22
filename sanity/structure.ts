@@ -23,6 +23,18 @@ function commentList(
     .defaultOrdering([{ field: "submittedAt", direction: "desc" }]);
 }
 
+function mapList(
+  S: StructureBuilder,
+  title: string,
+  filter: string,
+) {
+  return S.documentList()
+    .title(title)
+    .schemaType("campaignMap")
+    .filter(filter)
+    .defaultOrdering([{ field: "sortOrder", direction: "desc" }]);
+}
+
 export const structure: StructureResolver = (S) =>
   S.list()
     .title("Chronicle Content")
@@ -34,6 +46,29 @@ export const structure: StructureResolver = (S) =>
             .schemaType("siteSettings")
             .documentId("siteSettings")
             .title("Newspaper Settings"),
+        ),
+      S.listItem()
+        .title("Current Map")
+        .child(
+          mapList(
+            S,
+            "Current Map",
+            '_type == "campaignMap" && status == "current"',
+          ),
+        ),
+      S.listItem()
+        .title("Map Room Library")
+        .child(
+          mapList(
+            S,
+            "Map Room Library",
+            '_type == "campaignMap" && status == "archived"',
+          ),
+        ),
+      S.listItem()
+        .title("All Campaign Maps")
+        .child(
+          mapList(S, "All Campaign Maps", '_type == "campaignMap"'),
         ),
       S.divider(),
       S.listItem()

@@ -1,10 +1,8 @@
 import { createClient } from "next-sanity";
 import { defineLive } from "next-sanity/live";
+import { dataset, projectId } from "@/lib/sanity-config";
 
-export const projectId =
-  process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "uo48c7q4";
-export const dataset =
-  process.env.NEXT_PUBLIC_SANITY_DATASET || "production";
+export { dataset, projectId } from "@/lib/sanity-config";
 
 const readToken =
   process.env.SANITY_API_READ_TOKEN || process.env.SANITY_API_TOKEN || false;

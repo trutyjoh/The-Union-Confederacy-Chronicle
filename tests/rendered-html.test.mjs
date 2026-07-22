@@ -109,6 +109,36 @@ test("supports featured and inline dispatch images", async () => {
   assert.match(storyContent, /createImageUrlBuilder/);
 });
 
+test("provides a Sanity-managed chronological Map Room library", async () => {
+  const [mapSchema, schemaIndex, structure, locations, client, homePage, component] = await Promise.all([
+    readFile(new URL("../schemas/campaignMap.ts", import.meta.url), "utf8"),
+    readFile(new URL("../schemas/index.ts", import.meta.url), "utf8"),
+    readFile(new URL("../sanity/structure.ts", import.meta.url), "utf8"),
+    readFile(new URL("../sanity/presentation/resolve.ts", import.meta.url), "utf8"),
+    readFile(new URL("../lib/chronicle.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../components/MapRoomLibrary.tsx", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(mapSchema, /name: "campaignMap"/);
+  assert.match(mapSchema, /hotspot: true/);
+  assert.match(mapSchema, /value: "current"/);
+  assert.match(mapSchema, /value: "archived"/);
+  assert.match(schemaIndex, /campaignMap/);
+  assert.match(structure, /Map Room Library/);
+  assert.match(locations, /campaignMap/);
+  assert.match(client, /order\(sortOrder desc, campaignDate desc, _createdAt desc\)/);
+  assert.match(homePage, /MapRoomLibrary/);
+  assert.match(component, /Return to Current Map/);
+  assert.match(component, /archivedMaps\.map/);
+
+  const response = await render();
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /Map Room Library/i);
+  assert.match(html, /Current Campaign Map/i);
+});
+
 test("supports a chronological public dispatch archive", async () => {
   const [dispatchSchema, client, config, structure, homePage, dispatchPage] = await Promise.all([
     readFile(new URL("../schemas/campaignDispatch.ts", import.meta.url), "utf8"),

@@ -1,11 +1,24 @@
 import { stegaClean } from "@sanity/client/stega";
 import Link from "next/link";
+import { MapRoomLibrary } from "@/components/MapRoomLibrary";
 import { DispatchImage, excerptStoryBody, StoryBody } from "@/components/StoryContent";
-import { getChronicleContent } from "@/lib/chronicle";
+import { getChronicleContent, type CampaignMap } from "@/lib/chronicle";
 
 export default async function Home() {
-  const { settings, dispatches, archivedDispatches } = await getChronicleContent();
+  const { settings, dispatches, archivedDispatches, campaignMaps } = await getChronicleContent();
   const telegraphicDispatches = dispatches.slice(-5).reverse();
+  const managedCurrentMap = campaignMaps.find((map) => stegaClean(map.status) === "current");
+  const currentMap: CampaignMap = managedCurrentMap || {
+    _id: "newspaper-settings-current-map",
+    status: "current",
+    title: "Current Campaign Map",
+    campaignDate: settings.ledger.find((entry) => stegaClean(entry.label) === "Turn")?.value || settings.issueDate,
+    imageUrl: stegaClean(settings.mapReferenceUrl),
+    alt: settings.mapAlt,
+    caption: settings.mapCaption,
+    sortOrder: Number.MAX_SAFE_INTEGER,
+  };
+  const archivedMaps = campaignMaps.filter((map) => stegaClean(map.status) === "archived");
   const typographyClasses = [
     `type-masthead-${stegaClean(settings.mastheadTypeface || "fell")}`,
     `type-headline-${stegaClean(settings.headlineTypeface || "old-standard")}`,
@@ -117,10 +130,7 @@ export default async function Home() {
           <div className="section-rule">
             <span>The Map Room</span>
           </div>
-          <div className="map-frame">
-            <img src={stegaClean(settings.mapReferenceUrl)} alt={settings.mapAlt} />
-          </div>
-          <p className="caption">{settings.mapCaption}</p>
+          <MapRoomLibrary currentMap={currentMap} archivedMaps={archivedMaps} />
         </section>
 
         <section className="dispatch-section">

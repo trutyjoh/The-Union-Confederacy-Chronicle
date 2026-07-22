@@ -78,6 +78,18 @@ export type CampaignDispatch = {
   comments?: ReaderComment[];
 };
 
+export type CampaignMap = {
+  _id: string;
+  status: "current" | "archived";
+  title: string;
+  campaignDate: string;
+  image?: DispatchImage;
+  imageUrl?: string;
+  alt?: string;
+  caption?: string;
+  sortOrder: number;
+};
+
 export type ReaderComment = {
   _id: string;
   authorName: string;
@@ -90,6 +102,7 @@ export type ChronicleContent = {
   settings: ChronicleSettings;
   dispatches: CampaignDispatch[];
   archivedDispatches: CampaignDispatch[];
+  campaignMaps: CampaignMap[];
 };
 
 const chronicleQuery = defineQuery(/* groq */ `{
@@ -153,6 +166,18 @@ const chronicleQuery = defineQuery(/* groq */ `{
     title,
     dek,
     sortOrder
+  },
+  "campaignMaps": *[_type == "campaignMap" && status in ["current", "archived"]] | order(sortOrder desc, campaignDate desc, _createdAt desc){
+    _id,
+    status,
+    title,
+    campaignDate,
+    image{
+      ...,
+      asset->{_id, url, metadata{lqip, dimensions{width, height}}}
+    },
+    "imageUrl": image.asset->url,
+    sortOrder
   }
 }`);
 
@@ -197,16 +222,22 @@ const campaignDispatchQuery = defineQuery(/* groq */ `
 `);
 
 export async function getChronicleContent(): Promise<ChronicleContent> {
-  const fallback = fallbackContent as Omit<ChronicleContent, "archivedDispatches">;
+  const fallback = fallbackContent as Omit<ChronicleContent, "archivedDispatches" | "campaignMaps">;
   const fallbackWithArchive: ChronicleContent = {
     ...fallback,
     archivedDispatches: fallback.dispatches.filter((dispatch) => dispatch.status === "archived"),
+    campaignMaps: [],
   };
   try {
     const { data: content } = await sanityFetch({ query: chronicleQuery });
 
     const typedContent = content as ChronicleContent;
-    if (!typedContent?.settings || !typedContent.dispatches || !typedContent.archivedDispatches) {
+    if (
+      !typedContent?.settings ||
+      !typedContent.dispatches ||
+      !typedContent.archivedDispatches ||
+      !typedContent.campaignMaps
+    ) {
       return fallbackWithArchive;
     }
     return typedContent;
@@ -219,7 +250,7 @@ export async function getCampaignDispatch(
   slug: string,
   options: { stega?: boolean } = {},
 ): Promise<CampaignDispatch | null> {
-  const fallback = fallbackContent as Omit<ChronicleContent, "archivedDispatches">;
+  const fallback = fallbackContent as Omit<ChronicleContent, "archivedDispatches" | "campaignMaps">;
 
   try {
     const { data: dispatch } = await sanityFetch({
