@@ -178,7 +178,7 @@ test("supports a chronological public dispatch archive", async () => {
 });
 
 test("supports moderated reader comments on dispatches", async () => {
-  const [commentSchema, schemaIndex, structure, client, dispatchPage, form, route] = await Promise.all([
+  const [commentSchema, schemaIndex, structure, client, dispatchPage, form, route, notification, envExample] = await Promise.all([
     readFile(new URL("../schemas/dispatchComment.ts", import.meta.url), "utf8"),
     readFile(new URL("../schemas/index.ts", import.meta.url), "utf8"),
     readFile(new URL("../sanity/structure.ts", import.meta.url), "utf8"),
@@ -186,6 +186,8 @@ test("supports moderated reader comments on dispatches", async () => {
     readFile(new URL("../app/dispatches/[slug]/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../components/CommentForm.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/api/comments/route.ts", import.meta.url), "utf8"),
+    readFile(new URL("../lib/letter-notifications.ts", import.meta.url), "utf8"),
+    readFile(new URL("../.env.example", import.meta.url), "utf8"),
   ]);
 
   assert.match(commentSchema, /Reader Comment/);
@@ -195,6 +197,7 @@ test("supports moderated reader comments on dispatches", async () => {
   assert.match(commentSchema, /editorReply/);
   assert.match(schemaIndex, /dispatchComment/);
   assert.match(structure, /Pending Reader Comments/);
+  assert.match(structure, /\.id\("pendingLetters"\)/);
   assert.match(structure, /Approved Reader Comments/);
   assert.match(client, /status == "approved"/);
   assert.match(dispatchPage, /Letters to the Editor/);
@@ -203,6 +206,14 @@ test("supports moderated reader comments on dispatches", async () => {
   assert.match(route, /submissionFingerprint/);
   assert.match(route, /RATE_LIMIT_MAXIMUM/);
   assert.match(route, /drafts\.comment-/);
+  assert.match(route, /sendLetterNotification/);
+  assert.match(route, /email notification failed/);
+  assert.match(notification, /strifegames@gmail\.com/);
+  assert.match(notification, /RESEND_API_KEY/);
+  assert.match(notification, /Idempotency-Key/);
+  assert.match(notification, /escapeHtml/);
+  assert.match(notification, /Review pending letters in Sanity Studio/);
+  assert.match(envExample, /LETTER_NOTIFICATION_TO=strifegames@gmail\.com/);
 });
 
 test("uses compact dispatch previews and dedicated story pages", async () => {

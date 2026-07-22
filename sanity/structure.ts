@@ -105,6 +105,7 @@ export const structure: StructureResolver = (S) =>
         ),
       S.divider(),
       S.listItem()
+        .id("pendingLetters")
         .title("Pending Reader Comments")
         .child(
           commentList(

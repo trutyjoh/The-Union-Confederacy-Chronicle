@@ -1,5 +1,6 @@
 import { createClient, type SanityClient } from "next-sanity";
 import { NextResponse } from "next/server";
+import { sendLetterNotification } from "@/lib/letter-notifications";
 import { dataset, projectId } from "@/lib/sanity";
 
 export const runtime = "nodejs";
@@ -101,8 +102,12 @@ export async function POST(request: Request) {
   }
 
   try {
-    const dispatch = await client.fetch<{ _id: string } | null>(
-      `*[_type == "campaignDispatch" && _id == $dispatchId && coalesce(status, "current") == "current"][0]{_id}`,
+    const dispatch = await client.fetch<{
+      _id: string;
+      title: string;
+      slug: string;
+    } | null>(
+      `*[_type == "campaignDispatch" && _id == $dispatchId && coalesce(status, "current") == "current"][0]{_id, title, "slug": slug.current}`,
       { dispatchId },
     );
     if (!dispatch?._id) return json("That dispatch is not available for comments.", 404);
@@ -117,16 +122,33 @@ export async function POST(request: Request) {
       return json("Too many letters were submitted recently. Please try again in a few minutes.", 429);
     }
 
-    await client.create({
+    const submittedAt = new Date().toISOString();
+    const comment = await client.create({
       _id: `drafts.comment-${crypto.randomUUID()}`,
       _type: "dispatchComment",
       status: "pending",
       dispatch: { _type: "reference", _ref: dispatch._id },
       authorName,
       message,
-      submittedAt: new Date().toISOString(),
+      submittedAt,
       submissionFingerprint,
     });
+
+    try {
+      await sendLetterNotification({
+        commentId: comment._id,
+        authorName,
+        message,
+        dispatchTitle: dispatch.title,
+        dispatchSlug: dispatch.slug,
+        submittedAt,
+      });
+    } catch (error) {
+      console.error(
+        "A Letter to the Editor was saved, but its email notification failed.",
+        error instanceof Error ? error.message : "Unknown email error.",
+      );
+    }
 
     return json("Thank you. Your letter is awaiting editorial review.", 201);
   } catch {
