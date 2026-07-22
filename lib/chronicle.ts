@@ -89,6 +89,7 @@ export type ReaderComment = {
 export type ChronicleContent = {
   settings: ChronicleSettings;
   dispatches: CampaignDispatch[];
+  archivedDispatches: CampaignDispatch[];
 };
 
 const chronicleQuery = defineQuery(/* groq */ `{
@@ -142,6 +143,16 @@ const chronicleQuery = defineQuery(/* groq */ `{
     },
     note,
     sortOrder
+  },
+  "archivedDispatches": *[_type == "campaignDispatch" && status == "archived"] | order(sortOrder asc, campaignDate asc, _id asc){
+    _id,
+    "status": coalesce(status, "archived"),
+    "slug": slug.current,
+    eyebrow,
+    campaignDate,
+    title,
+    dek,
+    sortOrder
   }
 }`);
 
@@ -149,7 +160,7 @@ const campaignDispatchQuery = defineQuery(/* groq */ `
   *[
     _type == "campaignDispatch" &&
     slug.current == $slug &&
-    coalesce(status, "current") == "current"
+    coalesce(status, "current") in ["current", "archived"]
   ][0]{
     _id,
     "status": coalesce(status, "current"),
@@ -186,15 +197,21 @@ const campaignDispatchQuery = defineQuery(/* groq */ `
 `);
 
 export async function getChronicleContent(): Promise<ChronicleContent> {
-  const fallback = fallbackContent as ChronicleContent;
+  const fallback = fallbackContent as Omit<ChronicleContent, "archivedDispatches">;
+  const fallbackWithArchive: ChronicleContent = {
+    ...fallback,
+    archivedDispatches: fallback.dispatches.filter((dispatch) => dispatch.status === "archived"),
+  };
   try {
     const { data: content } = await sanityFetch({ query: chronicleQuery });
 
     const typedContent = content as ChronicleContent;
-    if (!typedContent?.settings || !typedContent.dispatches) return fallback;
+    if (!typedContent?.settings || !typedContent.dispatches || !typedContent.archivedDispatches) {
+      return fallbackWithArchive;
+    }
     return typedContent;
   } catch {
-    return fallback;
+    return fallbackWithArchive;
   }
 }
 
@@ -202,7 +219,7 @@ export async function getCampaignDispatch(
   slug: string,
   options: { stega?: boolean } = {},
 ): Promise<CampaignDispatch | null> {
-  const fallback = fallbackContent as ChronicleContent;
+  const fallback = fallbackContent as Omit<ChronicleContent, "archivedDispatches">;
 
   try {
     const { data: dispatch } = await sanityFetch({

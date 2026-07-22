@@ -90,12 +90,14 @@ test("supports featured and inline dispatch images", async () => {
   assert.match(storyContent, /createImageUrlBuilder/);
 });
 
-test("supports a private dispatch archive workflow", async () => {
-  const [dispatchSchema, client, config, structure] = await Promise.all([
+test("supports a chronological public dispatch archive", async () => {
+  const [dispatchSchema, client, config, structure, homePage, dispatchPage] = await Promise.all([
     readFile(new URL("../schemas/campaignDispatch.ts", import.meta.url), "utf8"),
     readFile(new URL("../lib/chronicle.ts", import.meta.url), "utf8"),
     readFile(new URL("../sanity.config.ts", import.meta.url), "utf8"),
     readFile(new URL("../sanity/structure.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/dispatches/[slug]/page.tsx", import.meta.url), "utf8"),
   ]);
 
   assert.match(dispatchSchema, /Dispatch status/);
@@ -103,10 +105,17 @@ test("supports a private dispatch archive workflow", async () => {
   assert.match(dispatchSchema, /value: "working"/);
   assert.match(dispatchSchema, /value: "archived"/);
   assert.match(client, /coalesce\(status, "current"\) == "current"/);
+  assert.match(client, /"archivedDispatches"/);
+  assert.match(client, /status == "archived"/);
+  assert.match(client, /order\(sortOrder asc, campaignDate asc, _id asc\)/);
+  assert.match(client, /in \["current", "archived"\]/);
   assert.match(config, /structureTool\(\{ structure \}\)/);
   assert.match(structure, /Current Dispatches/);
   assert.match(structure, /Working Drafts/);
   assert.match(structure, /Dispatch Archive/);
+  assert.match(homePage, /ledger-archive/);
+  assert.match(homePage, /archivedDispatches\.map/);
+  assert.match(dispatchPage, /Return to Campaign Archive/);
 });
 
 test("supports moderated reader comments on dispatches", async () => {

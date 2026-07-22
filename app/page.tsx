@@ -4,7 +4,7 @@ import { DispatchImage, excerptStoryBody, StoryBody } from "@/components/StoryCo
 import { getChronicleContent } from "@/lib/chronicle";
 
 export default async function Home() {
-  const { settings, dispatches } = await getChronicleContent();
+  const { settings, dispatches, archivedDispatches } = await getChronicleContent();
   const typographyClasses = [
     `type-masthead-${stegaClean(settings.mastheadTypeface || "fell")}`,
     `type-headline-${stegaClean(settings.headlineTypeface || "old-standard")}`,
@@ -86,6 +86,24 @@ export default async function Home() {
             <p className="smallprint">
               Campaign values and reports are now maintained in the Sanity editor at <code>/studio</code>.
             </p>
+            <section className="ledger-archive" id="archive" aria-labelledby="campaign-archive-heading">
+              <p className="section-label">Filed for Posterity</p>
+              <h3 id="campaign-archive-heading">Campaign Archive</h3>
+              {archivedDispatches.length ? (
+                <ol>
+                  {archivedDispatches.map((post) => (
+                    <li key={post._id || stegaClean(post.slug)}>
+                      <Link href={`/dispatches/${encodeURIComponent(stegaClean(post.slug))}`}>
+                        <span>{post.campaignDate}</span>
+                        <strong>{post.title}</strong>
+                      </Link>
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <p className="ledger-archive__empty">No dispatches have yet been filed in the archive.</p>
+              )}
+            </section>
           </aside>
         </section>
 
@@ -123,28 +141,6 @@ export default async function Home() {
               </article>
             ))}
           </div>
-        </section>
-
-        <section className="archive" id="archive">
-          <div>
-            <p className="section-label">Filed for Posterity</p>
-            <h2>Campaign Archive</h2>
-          </div>
-          <ol>
-            {settings.archive.map((entry) => (
-              <li key={entry._key || `${stegaClean(entry.number)}-${stegaClean(entry.title)}`}>
-                {entry.anchor ? (
-                  <a href={`#${stegaClean(entry.anchor)}`}>
-                    <span>{entry.number}</span> {entry.title}
-                  </a>
-                ) : (
-                  <span>
-                    <span>{entry.number}</span> {entry.title}
-                  </span>
-                )}
-              </li>
-            ))}
-          </ol>
         </section>
 
         <footer>

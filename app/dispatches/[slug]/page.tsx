@@ -40,6 +40,10 @@ export default async function DispatchPage({ params }: DispatchPageProps) {
 
   if (!dispatch) notFound();
 
+  const isArchived = stegaClean(dispatch.status) === "archived";
+  const returnHref = isArchived ? "/#archive" : "/";
+  const returnLabel = isArchived ? "Return to Campaign Archive" : "Return to the Chronicle";
+
   const typographyClasses = [
     `type-masthead-${stegaClean(settings.mastheadTypeface || "fell")}`,
     `type-headline-${stegaClean(settings.headlineTypeface || "old-standard")}`,
@@ -52,7 +56,7 @@ export default async function DispatchPage({ params }: DispatchPageProps) {
         <header className="masthead dispatch-masthead" id="top">
           <div className="utility-line">
             <span>{settings.volume}</span>
-            <Link href="/">← Return to Chronicle</Link>
+            <Link href={returnHref}>← {returnLabel}</Link>
             <span>{settings.issueDate}</span>
           </div>
           <p className="kicker">{settings.kicker}</p>
@@ -63,7 +67,7 @@ export default async function DispatchPage({ params }: DispatchPageProps) {
             </Link>
           </h1>
           <div className="motto">
-            <span>✦</span> Special Dispatch <span>✦</span>
+            <span>✦</span> {isArchived ? "Archived Dispatch" : "Special Dispatch"} <span>✦</span>
           </div>
         </header>
 
@@ -110,8 +114,8 @@ export default async function DispatchPage({ params }: DispatchPageProps) {
         </section>
 
         <div className="dispatch-return">
-          <Link className="return-button" href="/">
-            ← Return to the Chronicle front page
+          <Link className="return-button" href={returnHref}>
+            ← {returnLabel}
           </Link>
           <a href="#top">Return to the Masthead ↑</a>
         </div>
