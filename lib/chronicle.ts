@@ -1,6 +1,7 @@
 import fallbackContent from "@/content/chronicle.json";
 import { defineQuery } from "next-sanity";
-import { sanityFetch } from "@/lib/sanity";
+import { draftMode } from "next/headers";
+import { fetchFreshPublished, sanityFetch } from "@/lib/sanity";
 
 export type RichBody = string[] | Array<Record<string, unknown>>;
 
@@ -237,7 +238,10 @@ export async function getChronicleContent(): Promise<ChronicleContent> {
     campaignMaps: [],
   };
   try {
-    const { data: content } = await sanityFetch({ query: chronicleQuery });
+    const { isEnabled } = await draftMode();
+    const content = isEnabled
+      ? (await sanityFetch({ query: chronicleQuery })).data
+      : await fetchFreshPublished<ChronicleContent>(chronicleQuery);
 
     const typedContent = content as ChronicleContent;
     if (
@@ -261,11 +265,19 @@ export async function getCampaignDispatch(
   const fallback = fallbackContent as Omit<ChronicleContent, "archivedDispatches" | "campaignMaps">;
 
   try {
-    const { data: dispatch } = await sanityFetch({
-      query: campaignDispatchQuery,
-      params: { slug },
-      stega: options.stega,
-    });
+    const { isEnabled } = await draftMode();
+    const dispatch = isEnabled
+      ? (
+          await sanityFetch({
+            query: campaignDispatchQuery,
+            params: { slug },
+            stega: options.stega,
+          })
+        ).data
+      : await fetchFreshPublished<CampaignDispatch | null>(
+          campaignDispatchQuery,
+          { slug },
+        );
 
     if (dispatch) return dispatch as CampaignDispatch;
   } catch {

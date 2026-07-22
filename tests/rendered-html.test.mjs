@@ -149,6 +149,19 @@ test("provides a Sanity-managed chronological Map Room library", async () => {
   assert.match(html, /Confederate Activity Highlights/i);
 });
 
+test("refreshes published Sanity content for anonymous readers", async () => {
+  const [sanitySource, chronicleSource] = await Promise.all([
+    readFile(new URL("../lib/sanity.ts", import.meta.url), "utf8"),
+    readFile(new URL("../lib/chronicle.ts", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(sanitySource, /fetchFreshPublished/);
+  assert.match(sanitySource, /useCdn:\s*false/);
+  assert.match(sanitySource, /revalidate:\s*60/);
+  assert.match(chronicleSource, /await draftMode\(\)/);
+  assert.match(chronicleSource, /fetchFreshPublished<ChronicleContent>/);
+});
+
 test("supports a chronological public dispatch archive", async () => {
   const [dispatchSchema, client, config, structure, homePage, dispatchPage] = await Promise.all([
     readFile(new URL("../schemas/campaignDispatch.ts", import.meta.url), "utf8"),
