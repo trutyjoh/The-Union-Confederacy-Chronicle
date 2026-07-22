@@ -8,6 +8,7 @@ import { getCampaignDispatch, getChronicleContent } from "@/lib/chronicle";
 
 type DispatchPageProps = {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ from?: string }>;
 };
 
 function formatCommentDate(value: string) {
@@ -31,8 +32,8 @@ export async function generateMetadata({ params }: DispatchPageProps): Promise<M
   };
 }
 
-export default async function DispatchPage({ params }: DispatchPageProps) {
-  const { slug } = await params;
+export default async function DispatchPage({ params, searchParams }: DispatchPageProps) {
+  const [{ slug }, { from }] = await Promise.all([params, searchParams]);
   const [dispatch, { settings }] = await Promise.all([
     getCampaignDispatch(slug),
     getChronicleContent(),
@@ -41,8 +42,13 @@ export default async function DispatchPage({ params }: DispatchPageProps) {
   if (!dispatch) notFound();
 
   const isArchived = stegaClean(dispatch.status) === "archived";
-  const returnHref = isArchived ? "/#archive" : "/";
-  const returnLabel = isArchived ? "Return to Campaign Archive" : "Return to the Chronicle";
+  const fromTelegraphicSummary = !isArchived && from === "telegraphic-summary";
+  const returnHref = isArchived ? "/#archive" : fromTelegraphicSummary ? "/#telegraphic-summary" : "/";
+  const returnLabel = isArchived
+    ? "Return to Campaign Archive"
+    : fromTelegraphicSummary
+      ? "Return to Telegraphic Summary"
+      : "Return to the Chronicle";
 
   const typographyClasses = [
     `type-masthead-${stegaClean(settings.mastheadTypeface || "fell")}`,

@@ -26,6 +26,25 @@ test("server-renders the Chronicle newspaper", async () => {
   assert.match(html, /Open the Editor/i);
 });
 
+test("shows only the five newest active dispatches in the telegraphic summary", async () => {
+  const [homePage, dispatchPage] = await Promise.all([
+    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/dispatches/[slug]/page.tsx", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(homePage, /dispatches\.slice\(-5\)\.reverse\(\)/);
+  assert.match(homePage, /id="telegraphic-summary"/);
+  assert.match(homePage, /\?from=telegraphic-summary/);
+  assert.match(homePage, /post\.dek/);
+  assert.match(dispatchPage, /Return to Telegraphic Summary/);
+
+  const response = await render("/dispatches/manassas?from=telegraphic-summary");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /Return to Telegraphic Summary/i);
+  assert.match(html, /href="\/#telegraphic-summary"/i);
+});
+
 test("keeps Sanity content and schema in editable source files", async () => {
   const [page, client, config, content] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),

@@ -5,6 +5,7 @@ import { getChronicleContent } from "@/lib/chronicle";
 
 export default async function Home() {
   const { settings, dispatches, archivedDispatches } = await getChronicleContent();
+  const telegraphicDispatches = dispatches.slice(-5).reverse();
   const typographyClasses = [
     `type-masthead-${stegaClean(settings.mastheadTypeface || "fell")}`,
     `type-headline-${stegaClean(settings.headlineTypeface || "old-standard")}`,
@@ -37,16 +38,21 @@ export default async function Home() {
         </header>
 
         <section className="lead-grid" id="latest">
-          <aside className="side-column">
+          <aside className="side-column" id="telegraphic-summary">
             <p className="section-label">This Edition</p>
             <h2>Telegraphic Summary</h2>
-            <ul className="telegrams">
-              {settings.telegrams.map((item) => (
-                <li key={item._key || `${stegaClean(item.location)}-${stegaClean(item.text)}`}>
-                  <b>{item.location}</b> {item.text}
+            <ol className="telegrams dispatch-telegrams">
+              {telegraphicDispatches.map((post) => (
+                <li key={post._id || stegaClean(post.slug)}>
+                  <Link href={`/dispatches/${encodeURIComponent(stegaClean(post.slug))}?from=telegraphic-summary`}>
+                    <span className="telegram-dateline">{post.eyebrow} · {post.campaignDate}</span>
+                    <strong>{post.title}</strong>
+                    <span className="telegram-summary">{post.dek}</span>
+                    <span className="telegram-read">Read dispatch →</span>
+                  </Link>
                 </li>
               ))}
-            </ul>
+            </ol>
             <div className="ornament">❦</div>
             <h3>Editor&apos;s Purpose</h3>
             <p>{settings.editorPurpose}</p>

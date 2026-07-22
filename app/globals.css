@@ -26,6 +26,15 @@ h2,h3 { margin:0; line-height:.95; }
 .side-column p,.side-column li { font-size:13px; line-height:1.42; }
 .telegrams { list-style:none; padding:0; margin:12px 0 0; }
 .telegrams li { padding:8px 0; border-top:1px solid #8f785d; }
+.dispatch-telegrams li { padding:0; }
+.dispatch-telegrams a { display:block; padding:9px 2px; text-decoration:none; }
+.dispatch-telegrams a:hover,.dispatch-telegrams a:focus-visible { padding-inline:7px; color:var(--paper-light); background:var(--ink); outline:none; }
+.dispatch-telegrams strong,.dispatch-telegrams span { display:block; }
+.telegram-dateline { margin-bottom:3px; color:var(--red); text-transform:uppercase; font:700 8px/1.25 Arial,sans-serif; letter-spacing:.07em; }
+.dispatch-telegrams a:hover .telegram-dateline,.dispatch-telegrams a:focus-visible .telegram-dateline { color:var(--paper-light); }
+.dispatch-telegrams strong { font-size:14px; line-height:1.13; }
+.telegram-summary { margin-top:4px; font-size:11px; line-height:1.34; }
+.telegram-read { margin-top:5px; text-transform:uppercase; text-decoration:underline; font:700 8px Arial,sans-serif; letter-spacing:.08em; }
 .ornament { text-align:center; font-size:25px; margin:7px; }
 .lead-story { border-inline:1px solid #816d54; padding-inline:22px; }
 .lead-story h2 { font-family:"Arial Narrow",Impact,serif; text-transform:uppercase; text-align:center; font-size:clamp(52px,6vw,82px); line-height:.86; letter-spacing:-.035em; }
