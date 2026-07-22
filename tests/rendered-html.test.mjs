@@ -124,19 +124,27 @@ test("provides a Sanity-managed chronological Map Room library", async () => {
   assert.match(mapSchema, /hotspot: true/);
   assert.match(mapSchema, /value: "current"/);
   assert.match(mapSchema, /value: "archived"/);
+  assert.match(mapSchema, /name: "unionHighlights"/);
+  assert.match(mapSchema, /name: "confederateHighlights"/);
   assert.match(schemaIndex, /campaignMap/);
   assert.match(structure, /Map Room Library/);
   assert.match(locations, /campaignMap/);
   assert.match(client, /order\(sortOrder desc, campaignDate desc, _createdAt desc\)/);
+  assert.match(client, /unionHighlights/);
+  assert.match(client, /confederateHighlights/);
   assert.match(homePage, /MapRoomLibrary/);
   assert.match(component, /Return to Current Map/);
   assert.match(component, /archivedMaps\.map/);
+  assert.match(component, /Union Activity Highlights/);
+  assert.match(component, /Confederate Activity Highlights/);
 
   const response = await render();
   assert.equal(response.status, 200);
   const html = await response.text();
   assert.match(html, /Map Room Library/i);
   assert.match(html, /Current Campaign Map/i);
+  assert.match(html, /Union Activity Highlights/i);
+  assert.match(html, /Confederate Activity Highlights/i);
 });
 
 test("supports a chronological public dispatch archive", async () => {

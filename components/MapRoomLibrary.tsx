@@ -51,6 +51,24 @@ export function MapRoomLibrary({
           <img src={mapImageUrl(selectedMap, 1800)} alt={selectedMap.image?.alt || selectedMap.alt || ""} />
         </div>
         <p className="caption">{selectedMap.image?.caption || selectedMap.caption}</p>
+        <div className="map-highlights" aria-label={`Activity highlights for ${selectedMap.title}`}>
+          <article className="map-highlight map-highlight--union">
+            <p className="section-label">Union Report</p>
+            <h4>Union Activity Highlights</h4>
+            <p>
+              {selectedMap.unionHighlights ||
+                "No Union activity highlights have yet been entered for this campaign map."}
+            </p>
+          </article>
+          <article className="map-highlight map-highlight--confederate">
+            <p className="section-label">Confederate Report</p>
+            <h4>Confederate Activity Highlights</h4>
+            <p>
+              {selectedMap.confederateHighlights ||
+                "No Confederate activity highlights have yet been entered for this campaign map."}
+            </p>
+          </article>
+        </div>
       </div>
 
       <section className="map-library" aria-labelledby="map-library-heading">

@@ -16,6 +16,8 @@ export default async function Home() {
     imageUrl: stegaClean(settings.mapReferenceUrl),
     alt: settings.mapAlt,
     caption: settings.mapCaption,
+    unionHighlights: settings.mapUnionHighlights,
+    confederateHighlights: settings.mapConfederateHighlights,
     sortOrder: Number.MAX_SAFE_INTEGER,
   };
   const archivedMaps = campaignMaps.filter((map) => stegaClean(map.status) === "archived");

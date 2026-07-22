@@ -60,6 +60,22 @@ export const campaignMap = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: "unionHighlights",
+      title: "Union activity highlights",
+      type: "text",
+      rows: 5,
+      description:
+        "Describe Union movements, battles, reinforcements, losses, and other activity shown on this map.",
+    }),
+    defineField({
+      name: "confederateHighlights",
+      title: "Confederate activity highlights",
+      type: "text",
+      rows: 5,
+      description:
+        "Describe Confederate movements, battles, reinforcements, losses, and other activity shown on this map.",
+    }),
+    defineField({
       name: "sortOrder",
       title: "Chronology number",
       type: "number",

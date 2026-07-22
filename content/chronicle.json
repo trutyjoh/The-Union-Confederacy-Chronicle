@@ -40,6 +40,8 @@
     "mapReferenceUrl": "https://raw.githubusercontent.com/trutyjoh/The-Union-Confederacy-Chronicle/main/public/us-civil-war-map.jpg",
     "mapAlt": "Map board for GMT Games' The U.S. Civil War, showing the Eastern and Western theaters",
     "mapCaption": "The national theater of operations. Map artwork from the locally available U.S. Civil War digital game material; used here as a campaign reference.",
+    "mapUnionHighlights": "",
+    "mapConfederateHighlights": "",
     "archive": [
       { "number": "No. 1", "title": "Summer 1861: The Guns Speak", "anchor": "latest", "status": "published" },
       { "number": "No. 2", "title": "Summer 1861: Rivers & Rails", "status": "planned" },

@@ -129,6 +129,22 @@ export const siteSettings = defineType({
     defineField({ name: "mapAlt", title: "Map accessibility description", type: "string" }),
     defineField({ name: "mapCaption", title: "Map caption", type: "text", rows: 3 }),
     defineField({
+      name: "mapUnionHighlights",
+      title: "Current map — Union activity highlights",
+      type: "text",
+      rows: 5,
+      description:
+        "Shown in the faint Union-blue report box beneath the current Newspaper Settings map.",
+    }),
+    defineField({
+      name: "mapConfederateHighlights",
+      title: "Current map — Confederate activity highlights",
+      type: "text",
+      rows: 5,
+      description:
+        "Shown in the faint Confederate-gray report box beneath the current Newspaper Settings map.",
+    }),
+    defineField({
       name: "archive",
       title: "Campaign archive",
       type: "array",

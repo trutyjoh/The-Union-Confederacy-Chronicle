@@ -59,6 +59,8 @@ export type ChronicleSettings = {
   mapReferenceUrl: string;
   mapAlt: string;
   mapCaption: string;
+  mapUnionHighlights?: string;
+  mapConfederateHighlights?: string;
   archive: ArchiveEntry[];
   footerLine: string;
 };
@@ -87,6 +89,8 @@ export type CampaignMap = {
   imageUrl?: string;
   alt?: string;
   caption?: string;
+  unionHighlights?: string;
+  confederateHighlights?: string;
   sortOrder: number;
 };
 
@@ -132,6 +136,8 @@ const chronicleQuery = defineQuery(/* groq */ `{
     "mapReferenceUrl": coalesce(mapImage.asset->url, mapReferenceUrl),
     mapAlt,
     mapCaption,
+    mapUnionHighlights,
+    mapConfederateHighlights,
     archive[]{_key, number, title, anchor, status},
     footerLine
   },
@@ -177,6 +183,8 @@ const chronicleQuery = defineQuery(/* groq */ `{
       asset->{_id, url, metadata{lqip, dimensions{width, height}}}
     },
     "imageUrl": image.asset->url,
+    unionHighlights,
+    confederateHighlights,
     sortOrder
   }
 }`);
