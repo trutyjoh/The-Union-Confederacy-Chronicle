@@ -2,13 +2,13 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-async function render() {
+async function render(pathname = "/") {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
   workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
   const { default: worker } = await import(workerUrl.href);
 
   return worker.fetch(
-    new Request("http://localhost/", { headers: { accept: "text/html" } }),
+    new Request(`http://localhost${pathname}`, { headers: { accept: "text/html" } }),
     { ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) } },
     { waitUntil() {}, passThroughOnException() {} },
   );
@@ -74,11 +74,11 @@ test("offers curated period typography menus", async () => {
 });
 
 test("supports featured and inline dispatch images", async () => {
-  const [dispatchSchema, imageSchema, schemaIndex, page] = await Promise.all([
+  const [dispatchSchema, imageSchema, schemaIndex, storyContent] = await Promise.all([
     readFile(new URL("../schemas/campaignDispatch.ts", import.meta.url), "utf8"),
     readFile(new URL("../schemas/dispatchImage.ts", import.meta.url), "utf8"),
     readFile(new URL("../schemas/index.ts", import.meta.url), "utf8"),
-    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../components/StoryContent.tsx", import.meta.url), "utf8"),
   ]);
 
   assert.match(dispatchSchema, /featuredImage/);
@@ -86,8 +86,8 @@ test("supports featured and inline dispatch images", async () => {
   assert.match(imageSchema, /hotspot: true/);
   assert.match(imageSchema, /Accessibility description/);
   assert.match(schemaIndex, /dispatchImage/);
-  assert.match(page, /portableTextComponents/);
-  assert.match(page, /createImageUrlBuilder/);
+  assert.match(storyContent, /portableTextComponents/);
+  assert.match(storyContent, /createImageUrlBuilder/);
 });
 
 test("supports a private dispatch archive workflow", async () => {
@@ -110,12 +110,12 @@ test("supports a private dispatch archive workflow", async () => {
 });
 
 test("supports moderated reader comments on dispatches", async () => {
-  const [commentSchema, schemaIndex, structure, client, page, form, route] = await Promise.all([
+  const [commentSchema, schemaIndex, structure, client, dispatchPage, form, route] = await Promise.all([
     readFile(new URL("../schemas/dispatchComment.ts", import.meta.url), "utf8"),
     readFile(new URL("../schemas/index.ts", import.meta.url), "utf8"),
     readFile(new URL("../sanity/structure.ts", import.meta.url), "utf8"),
     readFile(new URL("../lib/chronicle.ts", import.meta.url), "utf8"),
-    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/dispatches/[slug]/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../components/CommentForm.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/api/comments/route.ts", import.meta.url), "utf8"),
   ]);
@@ -129,10 +129,34 @@ test("supports moderated reader comments on dispatches", async () => {
   assert.match(structure, /Pending Reader Comments/);
   assert.match(structure, /Approved Reader Comments/);
   assert.match(client, /status == "approved"/);
-  assert.match(page, /Letters to the Editor/);
+  assert.match(dispatchPage, /Letters to the Editor/);
   assert.match(form, /Submit for Review/);
   assert.match(route, /SANITY_API_WRITE_TOKEN/);
   assert.match(route, /submissionFingerprint/);
   assert.match(route, /RATE_LIMIT_MAXIMUM/);
   assert.match(route, /drafts\.comment-/);
+});
+
+test("uses compact dispatch previews and dedicated story pages", async () => {
+  const [homePage, dispatchPage, client, locations] = await Promise.all([
+    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/dispatches/[slug]/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../lib/chronicle.ts", import.meta.url), "utf8"),
+    readFile(new URL("../sanity/presentation/resolve.ts", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(homePage, /excerptStoryBody/);
+  assert.match(homePage, /Continue Reading/);
+  assert.match(homePage, /#letters-to-editor/);
+  assert.match(dispatchPage, /Return to the Chronicle/);
+  assert.match(dispatchPage, /CommentForm/);
+  assert.match(client, /campaignDispatchQuery/);
+  assert.match(client, /defineQuery/);
+  assert.match(locations, /\/dispatches\/\$\{document\.slug\}/);
+
+  const response = await render("/dispatches/manassas");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /Return to the Chronicle/i);
+  assert.match(html, /Letters to the Editor/i);
 });

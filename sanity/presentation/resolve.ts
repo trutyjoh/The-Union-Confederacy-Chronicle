@@ -22,7 +22,7 @@ export const presentationResolve: PresentationPluginOptions["resolve"] = {
         locations: [
           {
             title: document?.title || "Campaign dispatch",
-            href: document?.slug ? `/#${document.slug}` : "/",
+            href: document?.slug ? `/dispatches/${document.slug}` : "/",
           },
           { title: "Chronicle front page", href: "/" },
         ],

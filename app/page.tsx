@@ -1,79 +1,7 @@
-import { PortableText, type PortableTextComponents } from "@portabletext/react";
 import { stegaClean } from "@sanity/client/stega";
-import { createImageUrlBuilder } from "@sanity/image-url";
-import Image from "next/image";
-import type { PortableTextBlock } from "sanity";
-import {
-  getChronicleContent,
-  type DispatchImage as DispatchImageValue,
-  type RichBody,
-} from "@/lib/chronicle";
-import { CommentForm } from "@/components/CommentForm";
-import { dataset, projectId } from "@/lib/sanity";
-
-const imageBuilder = createImageUrlBuilder({ projectId, dataset });
-
-function DispatchImage({
-  value,
-  featured = false,
-}: {
-  value?: DispatchImageValue;
-  featured?: boolean;
-}) {
-  if (!value?.asset) return null;
-
-  const placement = featured ? "featured" : stegaClean(value.placement || "wide");
-  const treatment = stegaClean(value.treatment || "newspaper");
-  const sourceWidth = value.asset.metadata?.dimensions?.width || 1200;
-  const sourceHeight = value.asset.metadata?.dimensions?.height || 800;
-  const requestedWidth = featured || placement === "wide" ? 1200 : 720;
-  const requestedHeight = Math.round(requestedWidth * (sourceHeight / sourceWidth));
-  const src = imageBuilder.image(value).width(requestedWidth).fit("max").auto("format").url();
-
-  return (
-    <figure className={`dispatch-image dispatch-image--${placement} dispatch-image--${treatment}`}>
-      <Image
-        src={src}
-        alt={value.alt || ""}
-        width={requestedWidth}
-        height={requestedHeight}
-        sizes={featured || placement === "wide" ? "(max-width: 900px) 100vw, 560px" : "(max-width: 640px) 100vw, 280px"}
-        placeholder={value.asset.metadata?.lqip ? "blur" : "empty"}
-        blurDataURL={value.asset.metadata?.lqip}
-      />
-      {value.caption ? <figcaption>{value.caption}</figcaption> : null}
-    </figure>
-  );
-}
-
-const portableTextComponents: PortableTextComponents = {
-  types: {
-    dispatchImage: ({ value }) => <DispatchImage value={value as DispatchImageValue} />,
-  },
-};
-
-function StoryBody({ body, className }: { body: RichBody; className: string }) {
-  const isPlainText = body.every((block) => typeof block === "string");
-
-  return (
-    <div className={className}>
-      {isPlainText ? (
-        (body as string[]).map((paragraph) => <p key={stegaClean(paragraph)}>{paragraph}</p>)
-      ) : (
-        <PortableText value={body as PortableTextBlock[]} components={portableTextComponents} />
-      )}
-    </div>
-  );
-}
-
-function formatCommentDate(value: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(new Date(value));
-}
+import Link from "next/link";
+import { DispatchImage, excerptStoryBody, StoryBody } from "@/components/StoryContent";
+import { getChronicleContent } from "@/lib/chronicle";
 
 export default async function Home() {
   const { settings, dispatches } = await getChronicleContent();
@@ -177,43 +105,21 @@ export default async function Home() {
           </div>
           <div className="dispatch-grid">
             {dispatches.map((post) => (
-              <article className="dispatch" id={stegaClean(post.slug)} key={post._id || stegaClean(post.slug)}>
+              <article className="dispatch dispatch-preview" id={stegaClean(post.slug)} key={post._id || stegaClean(post.slug)}>
                 <p className="section-label">{post.eyebrow}</p>
                 <h2>{post.title}</h2>
                 <p className="post-date">{post.campaignDate}</p>
                 <p className="subhead">{post.dek}</p>
                 <DispatchImage value={post.featuredImage} featured />
-                <StoryBody body={post.body} className="body-copy" />
-                {post.note ? <blockquote>{post.note}</blockquote> : null}
-                {post._id ? (
-                  <section className="reader-comments" aria-labelledby={`comments-${stegaClean(post.slug)}`}>
-                    <div className="reader-comments__heading">
-                      <p className="section-label">Public Correspondence</p>
-                      <h3 id={`comments-${stegaClean(post.slug)}`}>Letters to the Editor</h3>
-                    </div>
-                    {post.comments?.length ? (
-                      <ol className="comment-list">
-                        {post.comments.map((comment) => (
-                          <li key={comment._id}>
-                            <p className="comment-list__meta">
-                              <strong>{comment.authorName}</strong>
-                              <span>{formatCommentDate(comment.submittedAt)}</span>
-                            </p>
-                            <p>{comment.message}</p>
-                            {comment.editorReply ? (
-                              <div className="editor-reply">
-                                <strong>The Editor Replies:</strong> {comment.editorReply}
-                              </div>
-                            ) : null}
-                          </li>
-                        ))}
-                      </ol>
-                    ) : (
-                      <p className="comment-list__empty">No letters have yet been selected for publication.</p>
-                    )}
-                    <CommentForm dispatchId={post._id} dispatchTitle={stegaClean(post.title)} />
-                  </section>
-                ) : null}
+                <StoryBody body={excerptStoryBody(post.body)} className="dispatch-excerpt" />
+                <div className="dispatch-links" aria-label={`Links for ${stegaClean(post.title)}`}>
+                  <Link href={`/dispatches/${encodeURIComponent(stegaClean(post.slug))}`}>
+                    Continue Reading <span aria-hidden="true">→</span>
+                  </Link>
+                  <Link href={`/dispatches/${encodeURIComponent(stegaClean(post.slug))}#letters-to-editor`}>
+                    Letters to the Editor
+                  </Link>
+                </div>
               </article>
             ))}
           </div>
@@ -244,7 +150,7 @@ export default async function Home() {
         <footer>
           <p>{settings.footerLine}</p>
           <div className="footer-links">
-            <a href="/studio">Open the Editor</a>
+            <Link href="/studio">Open the Editor</Link>
             <a href="#top">Return to the Masthead ↑</a>
           </div>
         </footer>

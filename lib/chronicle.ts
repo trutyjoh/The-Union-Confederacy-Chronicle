@@ -1,4 +1,5 @@
 import fallbackContent from "@/content/chronicle.json";
+import { defineQuery } from "next-sanity";
 import { sanityFetch } from "@/lib/sanity";
 
 export type RichBody = string[] | Array<Record<string, unknown>>;
@@ -90,7 +91,7 @@ export type ChronicleContent = {
   dispatches: CampaignDispatch[];
 };
 
-const chronicleQuery = `{
+const chronicleQuery = defineQuery(/* groq */ `{
   "settings": *[_type == "siteSettings"][0]{
     _id,
     "mastheadTypeface": coalesce(mastheadTypeface, "fell"),
@@ -140,6 +141,35 @@ const chronicleQuery = `{
       }
     },
     note,
+    sortOrder
+  }
+}`);
+
+const campaignDispatchQuery = defineQuery(/* groq */ `
+  *[
+    _type == "campaignDispatch" &&
+    slug.current == $slug &&
+    coalesce(status, "current") == "current"
+  ][0]{
+    _id,
+    "status": coalesce(status, "current"),
+    "slug": slug.current,
+    eyebrow,
+    campaignDate,
+    title,
+    dek,
+    featuredImage{
+      ...,
+      asset->{_id, url, metadata{lqip, dimensions{width, height}}}
+    },
+    body[]{
+      ...,
+      _type == "dispatchImage" => {
+        ...,
+        asset->{_id, url, metadata{lqip, dimensions{width, height}}}
+      }
+    },
+    note,
     sortOrder,
     "comments": *[
       _type == "dispatchComment" &&
@@ -153,7 +183,7 @@ const chronicleQuery = `{
       editorReply
     }
   }
-}`;
+`);
 
 export async function getChronicleContent(): Promise<ChronicleContent> {
   const fallback = fallbackContent as ChronicleContent;
@@ -166,4 +196,25 @@ export async function getChronicleContent(): Promise<ChronicleContent> {
   } catch {
     return fallback;
   }
+}
+
+export async function getCampaignDispatch(
+  slug: string,
+  options: { stega?: boolean } = {},
+): Promise<CampaignDispatch | null> {
+  const fallback = fallbackContent as ChronicleContent;
+
+  try {
+    const { data: dispatch } = await sanityFetch({
+      query: campaignDispatchQuery,
+      params: { slug },
+      stega: options.stega,
+    });
+
+    if (dispatch) return dispatch as CampaignDispatch;
+  } catch {
+    // The local fallback keeps dispatch routes usable when Sanity is unavailable.
+  }
+
+  return fallback.dispatches.find((dispatch) => dispatch.slug === slug) || null;
 }
