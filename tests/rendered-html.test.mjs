@@ -108,3 +108,31 @@ test("supports a private dispatch archive workflow", async () => {
   assert.match(structure, /Working Drafts/);
   assert.match(structure, /Dispatch Archive/);
 });
+
+test("supports moderated reader comments on dispatches", async () => {
+  const [commentSchema, schemaIndex, structure, client, page, form, route] = await Promise.all([
+    readFile(new URL("../schemas/dispatchComment.ts", import.meta.url), "utf8"),
+    readFile(new URL("../schemas/index.ts", import.meta.url), "utf8"),
+    readFile(new URL("../sanity/structure.ts", import.meta.url), "utf8"),
+    readFile(new URL("../lib/chronicle.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../components/CommentForm.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/comments/route.ts", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(commentSchema, /Reader Comment/);
+  assert.match(commentSchema, /Moderation status/);
+  assert.match(commentSchema, /value: "pending"/);
+  assert.match(commentSchema, /value: "approved"/);
+  assert.match(commentSchema, /editorReply/);
+  assert.match(schemaIndex, /dispatchComment/);
+  assert.match(structure, /Pending Reader Comments/);
+  assert.match(structure, /Approved Reader Comments/);
+  assert.match(client, /status == "approved"/);
+  assert.match(page, /Letters to the Editor/);
+  assert.match(form, /Submit for Review/);
+  assert.match(route, /SANITY_API_WRITE_TOKEN/);
+  assert.match(route, /submissionFingerprint/);
+  assert.match(route, /RATE_LIMIT_MAXIMUM/);
+  assert.match(route, /drafts\.comment-/);
+});

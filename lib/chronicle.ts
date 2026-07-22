@@ -74,6 +74,15 @@ export type CampaignDispatch = {
   body: RichBody;
   note: string;
   sortOrder: number;
+  comments?: ReaderComment[];
+};
+
+export type ReaderComment = {
+  _id: string;
+  authorName: string;
+  message: string;
+  submittedAt: string;
+  editorReply?: string;
 };
 
 export type ChronicleContent = {
@@ -131,7 +140,18 @@ const chronicleQuery = `{
       }
     },
     note,
-    sortOrder
+    sortOrder,
+    "comments": *[
+      _type == "dispatchComment" &&
+      status == "approved" &&
+      dispatch._ref == ^._id
+    ] | order(submittedAt asc){
+      _id,
+      authorName,
+      message,
+      submittedAt,
+      editorReply
+    }
   }
 }`;
 

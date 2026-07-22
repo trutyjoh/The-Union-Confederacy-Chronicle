@@ -11,6 +11,18 @@ function dispatchList(
     .filter(filter);
 }
 
+function commentList(
+  S: StructureBuilder,
+  title: string,
+  filter: string,
+) {
+  return S.documentList()
+    .title(title)
+    .schemaType("dispatchComment")
+    .filter(filter)
+    .defaultOrdering([{ field: "submittedAt", direction: "desc" }]);
+}
+
 export const structure: StructureResolver = (S) =>
   S.list()
     .title("Chronicle Content")
@@ -55,5 +67,42 @@ export const structure: StructureResolver = (S) =>
         .title("All Dispatches")
         .child(
           dispatchList(S, "All Dispatches", '_type == "campaignDispatch"'),
+        ),
+      S.divider(),
+      S.listItem()
+        .title("Pending Reader Comments")
+        .child(
+          commentList(
+            S,
+            "Pending Reader Comments",
+            '_type == "dispatchComment" && coalesce(status, "pending") == "pending"',
+          ),
+        ),
+      S.listItem()
+        .title("Approved Reader Comments")
+        .child(
+          commentList(
+            S,
+            "Approved Reader Comments",
+            '_type == "dispatchComment" && status == "approved"',
+          ),
+        ),
+      S.listItem()
+        .title("Rejected & Archived Comments")
+        .child(
+          commentList(
+            S,
+            "Rejected & Archived Comments",
+            '_type == "dispatchComment" && status in ["rejected", "archived"]',
+          ),
+        ),
+      S.listItem()
+        .title("All Reader Comments")
+        .child(
+          commentList(
+            S,
+            "All Reader Comments",
+            '_type == "dispatchComment"',
+          ),
         ),
     ]);

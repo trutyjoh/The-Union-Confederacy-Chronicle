@@ -8,6 +8,7 @@ import {
   type DispatchImage as DispatchImageValue,
   type RichBody,
 } from "@/lib/chronicle";
+import { CommentForm } from "@/components/CommentForm";
 import { dataset, projectId } from "@/lib/sanity";
 
 const imageBuilder = createImageUrlBuilder({ projectId, dataset });
@@ -63,6 +64,15 @@ function StoryBody({ body, className }: { body: RichBody; className: string }) {
       )}
     </div>
   );
+}
+
+function formatCommentDate(value: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(value));
 }
 
 export default async function Home() {
@@ -175,6 +185,35 @@ export default async function Home() {
                 <DispatchImage value={post.featuredImage} featured />
                 <StoryBody body={post.body} className="body-copy" />
                 {post.note ? <blockquote>{post.note}</blockquote> : null}
+                {post._id ? (
+                  <section className="reader-comments" aria-labelledby={`comments-${stegaClean(post.slug)}`}>
+                    <div className="reader-comments__heading">
+                      <p className="section-label">Public Correspondence</p>
+                      <h3 id={`comments-${stegaClean(post.slug)}`}>Letters to the Editor</h3>
+                    </div>
+                    {post.comments?.length ? (
+                      <ol className="comment-list">
+                        {post.comments.map((comment) => (
+                          <li key={comment._id}>
+                            <p className="comment-list__meta">
+                              <strong>{comment.authorName}</strong>
+                              <span>{formatCommentDate(comment.submittedAt)}</span>
+                            </p>
+                            <p>{comment.message}</p>
+                            {comment.editorReply ? (
+                              <div className="editor-reply">
+                                <strong>The Editor Replies:</strong> {comment.editorReply}
+                              </div>
+                            ) : null}
+                          </li>
+                        ))}
+                      </ol>
+                    ) : (
+                      <p className="comment-list__empty">No letters have yet been selected for publication.</p>
+                    )}
+                    <CommentForm dispatchId={post._id} dispatchTitle={stegaClean(post.title)} />
+                  </section>
+                ) : null}
               </article>
             ))}
           </div>
