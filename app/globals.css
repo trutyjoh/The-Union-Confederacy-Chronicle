@@ -65,8 +65,8 @@ code { font-family:"Courier New",monospace; }
 .ledger-archive__empty { margin:10px 0 0; font-size:11px; line-height:1.35; font-style:italic; }
 .section-rule { display:flex; align-items:center; gap:18px; margin:26px 0 16px; font-family:"Arial Narrow",Impact,sans-serif; font-size:33px; text-transform:uppercase; letter-spacing:.04em; }
 .section-rule::before,.section-rule::after { content:""; height:4px; flex:1; border-block:1px solid var(--rule); }
-.map-frame { padding:8px; border:1px solid #433324; background:#c6ad7d; filter:sepia(.45) contrast(.9) saturate(.72); }
-.map-frame img { display:block; width:100%; aspect-ratio:2/1; object-fit:cover; object-position:center; mix-blend-mode:multiply; }
+.map-frame { padding:8px; border:1px solid #433324; background:#c6ad7d; filter:sepia(.08) contrast(.99) saturate(.96); }
+.map-frame img { display:block; width:100%; aspect-ratio:2/1; object-fit:cover; object-position:center; opacity:.98; mix-blend-mode:normal; }
 .caption { margin:6px 0 0; text-align:center; }
 .dispatch-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:28px 0; }
 .dispatch-preview { min-width:0; padding:0 24px; }
