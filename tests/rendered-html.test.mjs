@@ -110,7 +110,7 @@ test("supports featured and inline dispatch images", async () => {
 });
 
 test("provides a Sanity-managed chronological Map Room library", async () => {
-  const [mapSchema, schemaIndex, structure, locations, client, homePage, component] = await Promise.all([
+  const [mapSchema, schemaIndex, structure, locations, client, homePage, component, styles] = await Promise.all([
     readFile(new URL("../schemas/campaignMap.ts", import.meta.url), "utf8"),
     readFile(new URL("../schemas/index.ts", import.meta.url), "utf8"),
     readFile(new URL("../sanity/structure.ts", import.meta.url), "utf8"),
@@ -118,6 +118,7 @@ test("provides a Sanity-managed chronological Map Room library", async () => {
     readFile(new URL("../lib/chronicle.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../components/MapRoomLibrary.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
   ]);
 
   assert.match(mapSchema, /name: "campaignMap"/);
@@ -137,6 +138,7 @@ test("provides a Sanity-managed chronological Map Room library", async () => {
   assert.match(component, /archivedMaps\.map/);
   assert.match(component, /Union Activity Highlights/);
   assert.match(component, /Confederate Activity Highlights/);
+  assert.match(styles, /\.map-frame img \{[^}]*aspect-ratio:3\/2/);
 
   const response = await render();
   assert.equal(response.status, 200);
