@@ -254,16 +254,18 @@ test("uses compact dispatch previews and dedicated story pages", async () => {
 });
 
 test("uses a compact two-column lead headline with a public archive", async () => {
-  const [homePage, headlineSchema, schemaIndex, structure, locations, client, detailPage, archivePage, styles] =
+  const [homePage, headlineSchema, settingsSchema, schemaIndex, structure, locations, client, detailPage, archivePage, migration, styles] =
     await Promise.all([
       readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
       readFile(new URL("../schemas/leadStory.ts", import.meta.url), "utf8"),
+      readFile(new URL("../schemas/siteSettings.ts", import.meta.url), "utf8"),
       readFile(new URL("../schemas/index.ts", import.meta.url), "utf8"),
       readFile(new URL("../sanity/structure.ts", import.meta.url), "utf8"),
       readFile(new URL("../sanity/presentation/resolve.ts", import.meta.url), "utf8"),
       readFile(new URL("../lib/chronicle.ts", import.meta.url), "utf8"),
       readFile(new URL("../app/headlines/[slug]/page.tsx", import.meta.url), "utf8"),
       readFile(new URL("../app/headlines/page.tsx", import.meta.url), "utf8"),
+      readFile(new URL("../scripts/migrate-lead-story.mjs", import.meta.url), "utf8"),
       readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
     ]);
 
@@ -277,14 +279,22 @@ test("uses a compact two-column lead headline with a public archive", async () =
   assert.match(headlineSchema, /Lead story headline/);
   assert.match(headlineSchema, /Lead story subheadline/);
   assert.match(headlineSchema, /Lead story byline/);
+  assert.match(headlineSchema, /Lead story text — complete article/);
+  assert.match(headlineSchema, /groups:/);
   assert.match(headlineSchema, /value: "current"/);
   assert.match(headlineSchema, /value: "archived"/);
+  assert.match(settingsSchema, /Legacy lead story headline/);
+  assert.match(settingsSchema, /archiveable Lead Story records/);
+  assert.match(settingsSchema, /hidden: true/);
   assert.match(schemaIndex, /leadStory/);
-  assert.match(structure, /Current Headline/);
-  assert.match(structure, /Headline Archive/);
+  assert.match(structure, /Current Lead Story/);
+  assert.match(structure, /Lead Story Archive/);
   assert.match(locations, /leadStory/);
   assert.match(client, /leadStoryQuery/);
   assert.match(client, /"leadStories"/);
+  assert.match(migration, /getCliClient/);
+  assert.match(migration, /client\.create/);
+  assert.match(migration, /status: "current"/);
   assert.match(detailPage, /Return to Headline Archive/);
   assert.match(archivePage, /archivedStories\.map/);
   assert.match(styles, /\.headline-excerpt[^}]*columns:2/);

@@ -60,27 +60,27 @@ export const structure: StructureResolver = (S) =>
             .title("Newspaper Settings"),
         ),
       S.listItem()
-        .title("Current Headline")
+        .title("Current Lead Story")
         .child(
           headlineList(
             S,
-            "Current Headline",
+            "Current Lead Story",
             '_type == "leadStory" && coalesce(status, "current") == "current"',
           ),
         ),
       S.listItem()
-        .title("Headline Archive")
+        .title("Lead Story Archive")
         .child(
           headlineList(
             S,
-            "Headline Archive",
+            "Lead Story Archive",
             '_type == "leadStory" && status == "archived"',
           ),
         ),
       S.listItem()
-        .title("All Headline Stories")
+        .title("All Lead Stories")
         .child(
-          headlineList(S, "All Headline Stories", '_type == "leadStory"'),
+          headlineList(S, "All Lead Stories", '_type == "leadStory"'),
         ),
       S.divider(),
       S.listItem()

@@ -1,4 +1,4 @@
-import { defineField, defineType } from "sanity";
+import { defineArrayMember, defineField, defineType } from "sanity";
 
 const requiredString = (name: string, title: string) =>
   defineField({
@@ -85,16 +85,62 @@ export const siteSettings = defineType({
       type: "text",
       rows: 4,
     }),
-    defineField({ name: "leadLabel", title: "Lead story label", type: "string" }),
-    requiredString("leadTitle", "Lead story headline"),
-    defineField({ name: "leadSubhead", title: "Lead story subheadline", type: "text", rows: 3 }),
-    defineField({ name: "leadByline", title: "Lead story byline", type: "string" }),
+    defineField({
+      name: "leadLabel",
+      title: "Legacy lead story label",
+      type: "string",
+      readOnly: true,
+      hidden: true,
+      deprecated: {
+        reason: "Lead stories are now edited as complete, archiveable Lead Story records.",
+      },
+      initialValue: undefined,
+    }),
+    defineField({
+      name: "leadTitle",
+      title: "Legacy lead story headline",
+      type: "string",
+      readOnly: true,
+      hidden: true,
+      deprecated: {
+        reason: "Lead stories are now edited as complete, archiveable Lead Story records.",
+      },
+      initialValue: undefined,
+    }),
+    defineField({
+      name: "leadSubhead",
+      title: "Legacy lead story subheadline",
+      type: "text",
+      rows: 3,
+      readOnly: true,
+      hidden: true,
+      deprecated: {
+        reason: "Lead stories are now edited as complete, archiveable Lead Story records.",
+      },
+      initialValue: undefined,
+    }),
+    defineField({
+      name: "leadByline",
+      title: "Legacy lead story byline",
+      type: "string",
+      readOnly: true,
+      hidden: true,
+      deprecated: {
+        reason: "Lead stories are now edited as complete, archiveable Lead Story records.",
+      },
+      initialValue: undefined,
+    }),
     defineField({
       name: "leadBody",
-      title: "Lead story text",
+      title: "Legacy lead story text",
       type: "array",
-      of: [{ type: "block" }],
-      validation: (rule) => rule.required(),
+      of: [defineArrayMember({ type: "block" })],
+      readOnly: true,
+      hidden: true,
+      deprecated: {
+        reason: "Lead stories are now edited as complete, archiveable Lead Story records.",
+      },
+      initialValue: undefined,
     }),
     defineField({ name: "unionStrategicWill", title: "Union strategic will", type: "string" }),
     defineField({ name: "confederateStrategicWill", title: "Confederate strategic will", type: "string" }),
