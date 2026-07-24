@@ -17,9 +17,11 @@ export default async function Home() {
     leadStories,
   } = await getChronicleContent();
   const telegraphicDispatches = dispatches.slice(-5).reverse();
+  const managedLeadStory = leadStories.find(
+    (story) => stegaClean(story.status) === "current",
+  );
   const leadStory =
-    leadStories.find((story) => stegaClean(story.status) === "current") ||
-    getLegacyLeadStory(settings);
+    managedLeadStory || (leadStories.length ? null : getLegacyLeadStory(settings));
   const managedCurrentMap = campaignMaps.find((map) => stegaClean(map.status) === "current");
   const currentMap: CampaignMap = managedCurrentMap || {
     _id: "newspaper-settings-current-map",
@@ -87,23 +89,41 @@ export default async function Home() {
           </aside>
 
           <article className="lead-story lead-story--headline">
-            <p className="section-label">{leadStory.label}</p>
-            <h2>{leadStory.title}</h2>
-            <p className="subhead">{leadStory.subheadline}</p>
-            <p className="byline">{leadStory.byline}</p>
-            <StoryBody
-              body={excerptStoryBody(leadStory.body, 2)}
-              className="headline-excerpt"
-            />
-            <div className="headline-actions">
-              <Link
-                className="headline-continue"
-                href={`/headlines/${encodeURIComponent(stegaClean(leadStory.slug))}`}
-              >
-                Continue to Read <span aria-hidden="true">→</span>
-              </Link>
-              <Link href="/headlines">Headline Archive</Link>
-            </div>
+            {leadStory ? (
+              <>
+                <p className="section-label">{leadStory.label}</p>
+                <h2>{leadStory.title}</h2>
+                <p className="subhead">{leadStory.subheadline}</p>
+                <p className="byline">{leadStory.byline}</p>
+                <StoryBody
+                  body={excerptStoryBody(leadStory.body, 2)}
+                  className="headline-excerpt"
+                />
+                <div className="headline-actions">
+                  <Link
+                    className="headline-continue"
+                    href={`/headlines/${encodeURIComponent(stegaClean(leadStory.slug))}`}
+                  >
+                    Continue to Read <span aria-hidden="true">→</span>
+                  </Link>
+                  <Link href="/headlines">Headline Archive</Link>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="section-label">Awaiting the Next Edition</p>
+                <h2>The Editor Prepares a New Lead Story</h2>
+                <p className="subhead">
+                  The previous lead story has been filed in the archive.
+                </p>
+                <p className="headline-placeholder">
+                  A new Current Lead Story may be selected in the Sanity editor.
+                </p>
+                <div className="headline-actions">
+                  <Link href="/headlines">Read the Lead Story Archive</Link>
+                </div>
+              </>
+            )}
           </article>
 
           <aside className="ledger" id="ledger">

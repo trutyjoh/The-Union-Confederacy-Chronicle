@@ -50,6 +50,7 @@ h2,h3 { margin:0; line-height:.95; }
 .headline-actions a { text-decoration:none; }
 .headline-actions a:hover,.headline-actions a:focus-visible { color:var(--red); text-decoration:underline; outline:none; }
 .headline-continue { color:var(--red); font-size:10px; }
+.headline-placeholder { margin:20px auto; max-width:470px; text-align:center; font-size:15px; line-height:1.5; font-style:italic; }
 .score-seals { display:flex; justify-content:center; gap:12px; margin:15px 0; }
 .score-seals div { display:grid; place-items:center; width:76px; height:76px; border:4px double var(--rule); border-radius:50%; }
 .score-seals span { font:700 10px Arial,sans-serif; letter-spacing:.12em; }

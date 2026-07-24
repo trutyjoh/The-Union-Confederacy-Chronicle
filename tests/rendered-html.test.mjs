@@ -270,6 +270,8 @@ test("uses a compact two-column lead headline with a public archive", async () =
     ]);
 
   assert.match(homePage, /lead-story--headline/);
+  assert.match(homePage, /leadStories\.length \? null/);
+  assert.match(homePage, /The previous lead story has been filed in the archive/);
   assert.match(homePage, /excerptStoryBody\(leadStory\.body, 2\)/);
   assert.match(homePage, /className="headline-excerpt"/);
   assert.match(homePage, /Continue to Read/);
