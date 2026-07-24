@@ -95,6 +95,18 @@ export type CampaignMap = {
   sortOrder: number;
 };
 
+export type LeadStory = {
+  _id: string;
+  status: "current" | "archived";
+  slug: string;
+  label: string;
+  title: string;
+  subheadline: string;
+  byline: string;
+  body: RichBody;
+  sortOrder: number;
+};
+
 export type ReaderComment = {
   _id: string;
   authorName: string;
@@ -108,6 +120,7 @@ export type ChronicleContent = {
   dispatches: CampaignDispatch[];
   archivedDispatches: CampaignDispatch[];
   campaignMaps: CampaignMap[];
+  leadStories: LeadStory[];
 };
 
 const chronicleQuery = defineQuery(/* groq */ `{
@@ -187,6 +200,23 @@ const chronicleQuery = defineQuery(/* groq */ `{
     unionHighlights,
     confederateHighlights,
     sortOrder
+  },
+  "leadStories": *[_type == "leadStory" && coalesce(status, "current") in ["current", "archived"]] | order(sortOrder desc, _updatedAt desc){
+    _id,
+    "status": coalesce(status, "current"),
+    "slug": slug.current,
+    label,
+    title,
+    subheadline,
+    byline,
+    body[]{
+      ...,
+      _type == "dispatchImage" => {
+        ...,
+        asset->{_id, url, metadata{lqip, dimensions{width, height}}}
+      }
+    },
+    sortOrder
   }
 }`);
 
@@ -230,12 +260,54 @@ const campaignDispatchQuery = defineQuery(/* groq */ `
   }
 `);
 
+const leadStoryQuery = defineQuery(/* groq */ `
+  *[
+    _type == "leadStory" &&
+    slug.current == $slug &&
+    coalesce(status, "current") in ["current", "archived"]
+  ][0]{
+    _id,
+    "status": coalesce(status, "current"),
+    "slug": slug.current,
+    label,
+    title,
+    subheadline,
+    byline,
+    body[]{
+      ...,
+      _type == "dispatchImage" => {
+        ...,
+        asset->{_id, url, metadata{lqip, dimensions{width, height}}}
+      }
+    },
+    sortOrder
+  }
+`);
+
+export function getLegacyLeadStory(settings: ChronicleSettings): LeadStory {
+  return {
+    _id: "newspaper-settings-lead-story",
+    status: "current",
+    slug: "current-headline",
+    label: settings.leadLabel,
+    title: settings.leadTitle,
+    subheadline: settings.leadSubhead,
+    byline: settings.leadByline,
+    body: settings.leadBody,
+    sortOrder: Number.MAX_SAFE_INTEGER,
+  };
+}
+
 export async function getChronicleContent(): Promise<ChronicleContent> {
-  const fallback = fallbackContent as Omit<ChronicleContent, "archivedDispatches" | "campaignMaps">;
+  const fallback = fallbackContent as Omit<
+    ChronicleContent,
+    "archivedDispatches" | "campaignMaps" | "leadStories"
+  >;
   const fallbackWithArchive: ChronicleContent = {
     ...fallback,
     archivedDispatches: fallback.dispatches.filter((dispatch) => dispatch.status === "archived"),
     campaignMaps: [],
+    leadStories: [],
   };
   try {
     const { isEnabled } = await draftMode();
@@ -248,7 +320,8 @@ export async function getChronicleContent(): Promise<ChronicleContent> {
       !typedContent?.settings ||
       !typedContent.dispatches ||
       !typedContent.archivedDispatches ||
-      !typedContent.campaignMaps
+      !typedContent.campaignMaps ||
+      !typedContent.leadStories
     ) {
       return fallbackWithArchive;
     }
@@ -262,7 +335,10 @@ export async function getCampaignDispatch(
   slug: string,
   options: { stega?: boolean } = {},
 ): Promise<CampaignDispatch | null> {
-  const fallback = fallbackContent as Omit<ChronicleContent, "archivedDispatches" | "campaignMaps">;
+  const fallback = fallbackContent as Omit<
+    ChronicleContent,
+    "archivedDispatches" | "campaignMaps" | "leadStories"
+  >;
 
   try {
     const { isEnabled } = await draftMode();
@@ -285,4 +361,33 @@ export async function getCampaignDispatch(
   }
 
   return fallback.dispatches.find((dispatch) => dispatch.slug === slug) || null;
+}
+
+export async function getLeadStory(
+  slug: string,
+  options: { stega?: boolean } = {},
+): Promise<LeadStory | null> {
+  try {
+    const { isEnabled } = await draftMode();
+    const story = isEnabled
+      ? (
+          await sanityFetch({
+            query: leadStoryQuery,
+            params: { slug },
+            stega: options.stega,
+          })
+        ).data
+      : await fetchFreshPublished<LeadStory | null>(
+          leadStoryQuery,
+          { slug },
+        );
+
+    if (story) return story as LeadStory;
+  } catch {
+    // The Newspaper Settings fallback keeps the original lead story readable.
+  }
+
+  if (slug !== "current-headline") return null;
+  const { settings } = await getChronicleContent();
+  return getLegacyLeadStory(settings);
 }

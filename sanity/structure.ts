@@ -35,6 +35,18 @@ function mapList(
     .defaultOrdering([{ field: "sortOrder", direction: "desc" }]);
 }
 
+function headlineList(
+  S: StructureBuilder,
+  title: string,
+  filter: string,
+) {
+  return S.documentList()
+    .title(title)
+    .schemaType("leadStory")
+    .filter(filter)
+    .defaultOrdering([{ field: "sortOrder", direction: "desc" }]);
+}
+
 export const structure: StructureResolver = (S) =>
   S.list()
     .title("Chronicle Content")
@@ -47,6 +59,30 @@ export const structure: StructureResolver = (S) =>
             .documentId("siteSettings")
             .title("Newspaper Settings"),
         ),
+      S.listItem()
+        .title("Current Headline")
+        .child(
+          headlineList(
+            S,
+            "Current Headline",
+            '_type == "leadStory" && coalesce(status, "current") == "current"',
+          ),
+        ),
+      S.listItem()
+        .title("Headline Archive")
+        .child(
+          headlineList(
+            S,
+            "Headline Archive",
+            '_type == "leadStory" && status == "archived"',
+          ),
+        ),
+      S.listItem()
+        .title("All Headline Stories")
+        .child(
+          headlineList(S, "All Headline Stories", '_type == "leadStory"'),
+        ),
+      S.divider(),
       S.listItem()
         .title("Current Map")
         .child(

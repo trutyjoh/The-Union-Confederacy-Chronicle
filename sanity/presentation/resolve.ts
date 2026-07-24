@@ -16,6 +16,19 @@ export const presentationResolve: PresentationPluginOptions["resolve"] = {
         ],
       }),
     }),
+    leadStory: defineLocations({
+      select: { title: "title", slug: "slug.current" },
+      resolve: (document) => ({
+        locations: [
+          {
+            title: document?.title || "Headline story",
+            href: document?.slug ? `/headlines/${document.slug}` : "/#latest",
+          },
+          { title: "Front-page headline", href: "/#latest" },
+          { title: "Headline archive", href: "/headlines" },
+        ],
+      }),
+    }),
     campaignDispatch: defineLocations({
       select: { title: "title", slug: "slug.current" },
       resolve: (document) => ({

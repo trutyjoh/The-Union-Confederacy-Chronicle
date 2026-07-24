@@ -252,3 +252,54 @@ test("uses compact dispatch previews and dedicated story pages", async () => {
   assert.match(html, /Return to the Chronicle/i);
   assert.match(html, /Letters to the Editor/i);
 });
+
+test("uses a compact two-column lead headline with a public archive", async () => {
+  const [homePage, headlineSchema, schemaIndex, structure, locations, client, detailPage, archivePage, styles] =
+    await Promise.all([
+      readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+      readFile(new URL("../schemas/leadStory.ts", import.meta.url), "utf8"),
+      readFile(new URL("../schemas/index.ts", import.meta.url), "utf8"),
+      readFile(new URL("../sanity/structure.ts", import.meta.url), "utf8"),
+      readFile(new URL("../sanity/presentation/resolve.ts", import.meta.url), "utf8"),
+      readFile(new URL("../lib/chronicle.ts", import.meta.url), "utf8"),
+      readFile(new URL("../app/headlines/[slug]/page.tsx", import.meta.url), "utf8"),
+      readFile(new URL("../app/headlines/page.tsx", import.meta.url), "utf8"),
+      readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
+    ]);
+
+  assert.match(homePage, /lead-story--headline/);
+  assert.match(homePage, /excerptStoryBody\(leadStory\.body, 2\)/);
+  assert.match(homePage, /className="headline-excerpt"/);
+  assert.match(homePage, /Continue to Read/);
+  assert.match(homePage, /Headline Archive/);
+  assert.match(headlineSchema, /name: "leadStory"/);
+  assert.match(headlineSchema, /Lead story label/);
+  assert.match(headlineSchema, /Lead story headline/);
+  assert.match(headlineSchema, /Lead story subheadline/);
+  assert.match(headlineSchema, /Lead story byline/);
+  assert.match(headlineSchema, /value: "current"/);
+  assert.match(headlineSchema, /value: "archived"/);
+  assert.match(schemaIndex, /leadStory/);
+  assert.match(structure, /Current Headline/);
+  assert.match(structure, /Headline Archive/);
+  assert.match(locations, /leadStory/);
+  assert.match(client, /leadStoryQuery/);
+  assert.match(client, /"leadStories"/);
+  assert.match(detailPage, /Return to Headline Archive/);
+  assert.match(archivePage, /archivedStories\.map/);
+  assert.match(styles, /\.headline-excerpt[^}]*columns:2/);
+  assert.match(styles, /\.headline-excerpt>p:first-child::first-letter/);
+  assert.match(styles, /\.lead-story--headline h2[^}]*font-family:var\(--font-old-standard\)/);
+
+  const [homeResponse, storyResponse, archiveResponse] = await Promise.all([
+    render(),
+    render("/headlines/current-headline"),
+    render("/headlines"),
+  ]);
+  assert.equal(homeResponse.status, 200);
+  assert.equal(storyResponse.status, 200);
+  assert.equal(archiveResponse.status, 200);
+  assert.match(await homeResponse.text(), /Continue to Read/i);
+  assert.match(await storyResponse.text(), /Return to the Front Page/i);
+  assert.match(await archiveResponse.text(), /Headline Archive/i);
+});

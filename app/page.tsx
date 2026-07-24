@@ -2,11 +2,24 @@ import { stegaClean } from "@sanity/client/stega";
 import Link from "next/link";
 import { MapRoomLibrary } from "@/components/MapRoomLibrary";
 import { DispatchImage, excerptStoryBody, StoryBody } from "@/components/StoryContent";
-import { getChronicleContent, type CampaignMap } from "@/lib/chronicle";
+import {
+  getChronicleContent,
+  getLegacyLeadStory,
+  type CampaignMap,
+} from "@/lib/chronicle";
 
 export default async function Home() {
-  const { settings, dispatches, archivedDispatches, campaignMaps } = await getChronicleContent();
+  const {
+    settings,
+    dispatches,
+    archivedDispatches,
+    campaignMaps,
+    leadStories,
+  } = await getChronicleContent();
   const telegraphicDispatches = dispatches.slice(-5).reverse();
+  const leadStory =
+    leadStories.find((story) => stegaClean(story.status) === "current") ||
+    getLegacyLeadStory(settings);
   const managedCurrentMap = campaignMaps.find((map) => stegaClean(map.status) === "current");
   const currentMap: CampaignMap = managedCurrentMap || {
     _id: "newspaper-settings-current-map",
@@ -73,12 +86,24 @@ export default async function Home() {
             <p>{settings.editorPurpose}</p>
           </aside>
 
-          <article className="lead-story">
-            <p className="section-label">{settings.leadLabel}</p>
-            <h2>{settings.leadTitle}</h2>
-            <p className="subhead">{settings.leadSubhead}</p>
-            <p className="byline">{settings.leadByline}</p>
-            <StoryBody body={settings.leadBody} className="story-columns" />
+          <article className="lead-story lead-story--headline">
+            <p className="section-label">{leadStory.label}</p>
+            <h2>{leadStory.title}</h2>
+            <p className="subhead">{leadStory.subheadline}</p>
+            <p className="byline">{leadStory.byline}</p>
+            <StoryBody
+              body={excerptStoryBody(leadStory.body, 2)}
+              className="headline-excerpt"
+            />
+            <div className="headline-actions">
+              <Link
+                className="headline-continue"
+                href={`/headlines/${encodeURIComponent(stegaClean(leadStory.slug))}`}
+              >
+                Continue to Read <span aria-hidden="true">→</span>
+              </Link>
+              <Link href="/headlines">Headline Archive</Link>
+            </div>
           </article>
 
           <aside className="ledger" id="ledger">
